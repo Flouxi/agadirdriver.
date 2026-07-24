@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Globe, User, Menu, X, ChevronDown, Phone, MapPin } from 'lucide-react';
-import logoAsset from '../assets/agadir-driver-logo.png.asset.json';
+import { AGADIR_DRIVER_LOGO_URL } from '../lib/brand-images';
 
 interface HeaderProps {
   onNavClick?: (section: string) => void;
@@ -60,7 +60,7 @@ export default function Header({ onNavClick }: HeaderProps) {
           {/* Logo */}
           <div className="flex items-center cursor-pointer" onClick={() => handleItemClick('hero')}>
             <img
-              src={logoAsset.url}
+              src={AGADIR_DRIVER_LOGO_URL}
               alt="Agadir Driver"
               className="h-10 sm:h-12 w-auto object-contain"
             />

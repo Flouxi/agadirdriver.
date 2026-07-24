@@ -1,6 +1,6 @@
 import React from 'react';
 import { Facebook, Instagram, Twitter, MessageCircle, ShieldCheck, HelpCircle, Phone, Mail } from 'lucide-react';
-import logoAsset from '../assets/agadir-driver-logo.png.asset.json';
+import { AGADIR_DRIVER_LOGO_URL } from '../lib/brand-images';
 
 export default function Footer() {
   const whatsappNumber = '2120606419700';
@@ -17,7 +17,7 @@ export default function Footer() {
           {/* Column 1: Brand & Assistance */}
           <div className="space-y-6">
             <div className="flex items-center">
-              <img src={logoAsset.url} alt="Agadir Driver" className="h-12 w-auto object-contain" />
+              <img src={AGADIR_DRIVER_LOGO_URL} alt="Agadir Driver" className="h-12 w-auto object-contain" />
             </div>
             
             <p className="text-xs text-gray-400 font-medium leading-relaxed">

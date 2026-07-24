@@ -1,9 +1,5 @@
 import { VehicleClass, Review, Destination, ServiceItem } from './types';
-import carMercedesE from './assets/images/car_mercedes_e.png.asset.json';
-import carSclass from './assets/images/car_sclass.png.asset.json';
-import carSkoda from './assets/images/car_skoda.png.asset.json';
-import carVito from './assets/images/car_vito.png.asset.json';
-import carSprinter from './assets/images/car_sprinter.png.asset.json';
+import { VEHICLE_IMAGE_URLS } from './lib/brand-images';
 
 // Tarifs alignés sur les prix réels du marché marocain (chauffeur privé, EUR).
 // Réf. : 1€ ≈ 10,7 MAD — trajets type Marrakech→Essaouira (~175 km) ≈ 800-1000 MAD ≈ 74-92€.
@@ -16,7 +12,7 @@ export const VEHICLES: VehicleClass[] = [
     luggage: 3,
     pricePerKm: 0.55,
     basePrice: 15,
-    image: carMercedesE.url,
+    image: VEHICLE_IMAGE_URLS.standard,
     carModels: 'Mercedes Classe E, BMW Série 5, Audi A6 ou similaire'
   },
   {
@@ -27,7 +23,7 @@ export const VEHICLES: VehicleClass[] = [
     luggage: 3,
     pricePerKm: 0.95,
     basePrice: 30,
-    image: carSclass.url,
+    image: VEHICLE_IMAGE_URLS.first,
     carModels: 'Mercedes Classe S, BMW Série 7, Audi A8 ou similaire'
   },
   {
@@ -38,7 +34,7 @@ export const VEHICLES: VehicleClass[] = [
     luggage: 6,
     pricePerKm: 0.70,
     basePrice: 20,
-    image: carSkoda.url,
+    image: VEHICLE_IMAGE_URLS.suv,
     carModels: 'Mercedes GLE, Range Rover, Cadillac Escalade ou similaire'
   },
   {
@@ -49,7 +45,7 @@ export const VEHICLES: VehicleClass[] = [
     luggage: 7,
     pricePerKm: 0.65,
     basePrice: 20,
-    image: carVito.url,
+    image: VEHICLE_IMAGE_URLS.vanStandard,
     carModels: 'Mercedes Vito, Ford Transit Custom, Hyundai H1 ou similaire'
   },
   {
@@ -60,7 +56,7 @@ export const VEHICLES: VehicleClass[] = [
     luggage: 7,
     pricePerKm: 1.05,
     basePrice: 35,
-    image: carSprinter.url,
+    image: VEHICLE_IMAGE_URLS.vanFirst,
     carModels: 'Mercedes Classe V, Volkswagen Multivan Business ou similaire'
   }
 ];

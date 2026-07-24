@@ -12,7 +12,7 @@ import DestinationsSection from "../components/DestinationsSection";
 import NewsletterSection from "../components/NewsletterSection";
 import Footer from "../components/Footer";
 import type { VehicleClass } from "../types";
-import heroImg from "../assets/images/hero_couple.jpg.asset.json";
+import { HOMEPAGE_HERO_IMAGE_URL } from "../lib/brand-images";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -79,7 +79,7 @@ function Index() {
           {/* Backdrop image with dark gradient overlay */}
           <div className="absolute inset-0">
             <img
-              src={heroImg.url}
+              src={HOMEPAGE_HERO_IMAGE_URL}
               alt=""
               aria-hidden="true"
               className="w-full h-full object-cover object-center opacity-40 lg:opacity-30"

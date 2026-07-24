@@ -1,7 +1,6 @@
 import React from 'react';
 import { Sparkles, Compass, CheckCircle2, Map, Users, Milestone } from 'lucide-react';
-import travelCoupleImg from "../assets/images/travel_couple.jpg.asset.json";
-import luxuryVanImg from "../assets/images/luxury_van.jpg.asset.json";
+import { INFO_SECTION_PRIMARY_IMAGE_URL, INFO_SECTION_SECONDARY_IMAGE_URL } from '../lib/brand-images';
 
 export default function InfoSection() {
   return (
@@ -15,7 +14,7 @@ export default function InfoSection() {
           <div className="lg:col-span-5 relative group">
             <div className="absolute -inset-1.5 bg-gradient-to-r from-yellow-500/30 to-amber-500/30 rounded-3xl blur-md opacity-70 group-hover:opacity-100 transition-opacity"></div>
             <img
-              src={travelCoupleImg.url}
+              src={INFO_SECTION_PRIMARY_IMAGE_URL}
               alt="Chauffeur accueillant un couple de voyageurs élégants à Agadir"
               className="relative rounded-2xl w-full object-cover aspect-[4/3] shadow-lg"
               referrerPolicy="no-referrer"
@@ -116,7 +115,7 @@ export default function InfoSection() {
           <div className="lg:col-span-5 relative group order-1 lg:order-2">
             <div className="absolute -inset-1.5 bg-gradient-to-r from-yellow-500/30 to-amber-500/30 rounded-3xl blur-md opacity-70 group-hover:opacity-100 transition-opacity"></div>
             <img
-              src={luxuryVanImg.url}
+              src={INFO_SECTION_SECONDARY_IMAGE_URL}
               alt="Mercedes Classe V haut de gamme garée devant un complexe hôtelier à Agadir"
               className="relative rounded-2xl w-full object-cover aspect-[4/3] shadow-lg"
               referrerPolicy="no-referrer"
