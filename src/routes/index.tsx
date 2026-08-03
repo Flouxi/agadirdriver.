@@ -1,18 +1,18 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
-import { ShieldCheck, Star, Clock } from "lucide-react";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { ShieldCheck, Star, Clock, Check } from "lucide-react";
 import Header from "../components/Header";
-import BookingWidget from "../components/BookingWidget";
-import AppPromo from "../components/AppPromo";
+import SearchBar from "../components/SearchBar";
 import FeaturesGrid from "../components/FeaturesGrid";
 import InfoSection from "../components/InfoSection";
 import VehicleCarousel from "../components/VehicleCarousel";
 import ReviewGrid from "../components/ReviewGrid";
 import DestinationsSection from "../components/DestinationsSection";
+import AppPromo from "../components/AppPromo";
 import NewsletterSection from "../components/NewsletterSection";
 import Footer from "../components/Footer";
-import type { VehicleClass } from "../types";
 import { HOMEPAGE_HERO_IMAGE_URL } from "../lib/brand-images";
+import { searchLocations } from "../lib/location-search";
+import { addDaysIso } from "../lib/trip";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -23,10 +23,14 @@ export const Route = createFileRoute("/")({
         content:
           "Réservez un chauffeur privé à Agadir, Taghazout et partout au Maroc. Transferts aéroport, trajets ville à ville et location à l'heure, prix fixes.",
       },
-      { property: "og:title", content: "Agadir Driver — Chauffeur privé & transferts premium à Agadir" },
+      {
+        property: "og:title",
+        content: "Agadir Driver — Chauffeur privé & transferts premium à Agadir",
+      },
       {
         property: "og:description",
-        content: "Réservez un chauffeur privé à Agadir, Taghazout et partout au Maroc. Transferts aéroport, trajets ville à ville et location à l'heure, prix fixes.",
+        content:
+          "Réservez un chauffeur privé à Agadir, Taghazout et partout au Maroc. Transferts aéroport, trajets ville à ville et location à l'heure, prix fixes.",
       },
       { property: "og:type", content: "website" },
       { property: "og:url", content: "/" },
@@ -36,163 +40,128 @@ export const Route = createFileRoute("/")({
   component: Index,
 });
 
+const TRUST_ITEMS = [
+  { Icon: Star, value: "4,9 / 5", label: "38 036 avis vérifiés" },
+  { Icon: ShieldCheck, value: "Prix fixe", label: "Taxes et péages inclus" },
+  { Icon: Clock, value: "24/7", label: "Assistance en français" },
+];
+
+const HERO_BULLETS = [
+  "Annulation gratuite jusqu'à 24 h avant",
+  "60 min d'attente offertes à l'aéroport",
+  "Chauffeur assigné 6 h avant le départ",
+];
+
+/** Resolve a display name to a real catalog label so pricing stays accurate. */
+function resolveLabel(name: string) {
+  const groups = searchLocations(name, "all", 1);
+  return groups[0]?.options[0]?.label ?? name;
+}
+
 function Index() {
-  const [toLocation, setToLocation] = useState("");
-  const [vehicleId, setVehicleId] = useState("");
-  const [bookingKey, setBookingKey] = useState(0);
+  const navigate = useNavigate();
 
-  const handleSelectDestination = (destinationName: string) => {
-    setToLocation(destinationName);
-    setVehicleId("");
-    setBookingKey((prev) => prev + 1);
+  const scrollTo = (id: string) => {
+    const el = document.getElementById(id);
+    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+    else window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const handleSelectVehicle = (vehicle: VehicleClass) => {
-    setToLocation("Taghazout (Hôtel / Surf Camp)");
-    setVehicleId(vehicle.id);
-    setBookingKey((prev) => prev + 1);
-  };
-
-  const handleNavScroll = (sectionId: string) => {
-    if (sectionId === "hero") {
-      window.scrollTo({ top: 0, behavior: "smooth" });
+  const handleNavClick = (section: string) => {
+    if (section === "destinations" || section === "help") {
+      scrollTo(section === "help" ? "footer" : "destinations");
       return;
     }
-    let targetElement: HTMLElement | null = null;
-    if (sectionId === "airport" || sectionId === "intercity" || sectionId === "hourly") {
-      targetElement = document.getElementById("booking-interface");
-    } else if (sectionId === "help" || sectionId === "business") {
-      targetElement = document.getElementById("footer-anchor");
-    }
-    if (targetElement) {
-      targetElement.scrollIntoView({ behavior: "smooth", block: "center" });
-    }
+    scrollTo("booking");
+  };
+
+  const handleSelectDestination = (destinationName: string) => {
+    navigate({
+      to: "/reservation",
+      search: {
+        from: "Aéroport Agadir Al Massira (AGA)",
+        to: resolveLabel(destinationName),
+        date: addDaysIso(1),
+        time: "10:00",
+        pax: 2,
+        mode: "transfer",
+      },
+    });
   };
 
   return (
-    <div className="min-h-screen bg-white flex flex-col justify-between selection:bg-[#EAB308]/30 selection:text-black">
-      <Header onNavClick={handleNavScroll} />
+    <div className="flex min-h-screen flex-col bg-background">
+      <Header onNavClick={handleNavClick} />
 
       <main className="flex-1">
-        {/* Redesigned Hero — structured & professional on desktop */}
-        <section className="relative overflow-hidden bg-[#0F1115]">
-          {/* Backdrop image with dark gradient overlay */}
-          <div className="absolute inset-0">
-            <img
-              src={HOMEPAGE_HERO_IMAGE_URL}
-              alt=""
-              aria-hidden="true"
-              className="w-full h-full object-cover object-center opacity-40 lg:opacity-30"
-            />
-            <div className="absolute inset-0 bg-gradient-to-r from-[#0F1115] via-[#0F1115]/95 to-[#0F1115]/40" />
-            <div className="absolute inset-0 bg-gradient-to-b from-[#0F1115]/60 via-transparent to-[#0F1115]" />
-          </div>
-
-          {/* Subtle grid pattern */}
-          <div
-            className="absolute inset-0 opacity-[0.04] pointer-events-none"
-            style={{
-              backgroundImage:
-                "linear-gradient(#EAB308 1px, transparent 1px), linear-gradient(90deg, #EAB308 1px, transparent 1px)",
-              backgroundSize: "48px 48px",
-            }}
-          />
-
-          <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 lg:py-24">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-start">
-              {/* Left: headline + trust */}
-              <div className="lg:col-span-6 xl:col-span-6 space-y-8 text-white">
-                <div className="inline-flex items-center gap-2 rounded-full border border-[#EAB308]/30 bg-[#EAB308]/10 px-3 py-1.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#EAB308] animate-pulse" />
-                  <span className="text-[10px] font-bold text-[#EAB308] uppercase tracking-widest font-mono">
-                    Partenaire Officiel Aéroport d'Agadir
-                  </span>
-                </div>
-
-                <h1 className="font-display font-black tracking-tight uppercase leading-[0.95] text-4xl sm:text-5xl lg:text-6xl xl:text-7xl">
-                  Chauffeur privé
-                  <br />
-                  <span className="text-[#EAB308]">premium</span> à Agadir
+        {/* Hero */}
+        <section className="border-b border-border">
+          <div className="mx-auto max-w-7xl px-4 pt-10 pb-10 sm:px-6 lg:px-8 lg:pt-16 lg:pb-14">
+            <div className="grid grid-cols-1 items-center gap-10 lg:grid-cols-12 lg:gap-14">
+              <div className="lg:col-span-6">
+                <h1 className="text-4xl leading-[1.05] font-semibold tracking-tight text-balance text-foreground sm:text-5xl lg:text-6xl">
+                  Allez où vous voulez, avec un chauffeur privé
                 </h1>
-
-                <p className="text-base lg:text-lg text-gray-300 font-medium max-w-xl leading-relaxed">
-                  Transferts aéroportuaires, trajets ville à ville et mise à
-                  disposition à l'heure. Prix fixes, chauffeurs multilingues,
-                  véhicules haut de gamme.
+                <p className="mt-5 max-w-lg text-base leading-relaxed text-muted-foreground sm:text-lg">
+                  Transferts aéroport, trajets entre villes et mise à disposition à l&apos;heure à
+                  Agadir, Taghazout et partout au Maroc. Prix fixe confirmé avant de réserver.
                 </p>
 
-                {/* Trust strip */}
-                <div className="grid grid-cols-3 gap-4 max-w-xl pt-4 border-t border-white/10">
-                  <div className="flex items-start gap-2.5">
-                    <div className="w-9 h-9 rounded-lg bg-[#EAB308]/15 text-[#EAB308] flex items-center justify-center shrink-0">
-                      <Star size={16} strokeWidth={2.5} />
-                    </div>
-                    <div>
-                      <div className="text-sm font-extrabold text-white">4.9/5</div>
-                      <div className="text-[11px] text-gray-400 font-medium">+2 400 avis</div>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-2.5">
-                    <div className="w-9 h-9 rounded-lg bg-[#EAB308]/15 text-[#EAB308] flex items-center justify-center shrink-0">
-                      <ShieldCheck size={16} strokeWidth={2.5} />
-                    </div>
-                    <div>
-                      <div className="text-sm font-extrabold text-white">Assuré</div>
-                      <div className="text-[11px] text-gray-400 font-medium">Flotte certifiée</div>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-2.5">
-                    <div className="w-9 h-9 rounded-lg bg-[#EAB308]/15 text-[#EAB308] flex items-center justify-center shrink-0">
-                      <Clock size={16} strokeWidth={2.5} />
-                    </div>
-                    <div>
-                      <div className="text-sm font-extrabold text-white">24/7</div>
-                      <div className="text-[11px] text-gray-400 font-medium">Assistance</div>
-                    </div>
-                  </div>
-                </div>
+                <ul className="mt-6 flex flex-col gap-2.5">
+                  {HERO_BULLETS.map((bullet) => (
+                    <li
+                      key={bullet}
+                      className="flex items-center gap-2.5 text-[15px] text-foreground"
+                    >
+                      <Check size={16} strokeWidth={2.5} aria-hidden="true" />
+                      {bullet}
+                    </li>
+                  ))}
+                </ul>
               </div>
 
-              {/* Right: Booking card */}
-              <div className="lg:col-span-6 xl:col-span-6">
-                <div className="relative">
-                  <div className="absolute -inset-1 bg-gradient-to-br from-[#EAB308]/40 to-transparent rounded-3xl blur-xl opacity-60" />
-                  <div className="relative rounded-2xl bg-[#0f1115] shadow-2xl ring-1 ring-[#F5A623]/20 overflow-hidden">
-                    <div className="flex items-center justify-between px-5 py-3 bg-[#0F1115] text-white border-b border-black/10">
-                      <div className="flex items-center gap-2">
-                        <span className="w-2 h-2 rounded-full bg-[#EAB308]" />
-                        <span className="text-xs font-bold uppercase tracking-wider font-mono">
-                          Réservation instantanée
-                        </span>
-                      </div>
-                      <span className="text-[10px] text-gray-400 font-mono uppercase tracking-widest hidden sm:inline">
-                        Prix fixe garanti
-                      </span>
-                    </div>
-                    <div className="p-5 sm:p-6">
-                      <BookingWidget
-                        key={bookingKey}
-                        initialToLocation={toLocation}
-                        initialVehicleId={vehicleId}
-                      />
-                    </div>
-                  </div>
-                </div>
+              <div className="lg:col-span-6">
+                <img
+                  src={HOMEPAGE_HERO_IMAGE_URL}
+                  alt="Berline noire avec chauffeur privé attendant un passager"
+                  className="aspect-4/3 w-full rounded-2xl object-cover"
+                  referrerPolicy="no-referrer"
+                />
               </div>
+            </div>
+
+            {/* One-row search */}
+            <div id="booking" className="mt-10 scroll-mt-24 lg:mt-14">
+              <SearchBar />
+            </div>
+
+            {/* Trust strip */}
+            <div className="mt-10 grid grid-cols-1 gap-6 border-t border-border pt-8 sm:grid-cols-3">
+              {TRUST_ITEMS.map(({ Icon, value, label }) => (
+                <div key={value} className="flex items-center gap-3">
+                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-muted">
+                    <Icon size={17} strokeWidth={2} aria-hidden="true" />
+                  </span>
+                  <span>
+                    <span className="block text-[15px] font-semibold text-foreground">{value}</span>
+                    <span className="block text-[13px] text-muted-foreground">{label}</span>
+                  </span>
+                </div>
+              ))}
             </div>
           </div>
         </section>
 
-        <AppPromo />
         <FeaturesGrid />
+        <VehicleCarousel onBookVehicle={() => scrollTo("booking")} />
         <InfoSection />
-        <VehicleCarousel onSelectVehicle={handleSelectVehicle} />
-        <ReviewGrid />
         <DestinationsSection onSelectDestination={handleSelectDestination} />
+        <ReviewGrid />
+        <AppPromo />
         <NewsletterSection />
       </main>
 
-      <div id="footer-anchor">
+      <div id="footer">
         <Footer />
       </div>
     </div>
