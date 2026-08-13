@@ -2,6 +2,8 @@
 // To add a new location, just append its label + x/y here — no other code change needed.
 // x = 0 (west/ocean) → 800 (east). y = 0 (north) → 1000 (south).
 
+import { findLocationByLabel } from './locations';
+
 export const MAP_VIEW_BOX = { width: 800, height: 1000 };
 
 export type MapPoint = { x: number; y: number };
@@ -24,6 +26,20 @@ export const MAP_POSITIONS: Record<string, MapPoint> = {
   // Cities
   "Agadir Centre-Ville": { x: 97, y: 886 },
   "Agadir Centre-Ville (Hôtel / Adresse de votre choix)": { x: 97, y: 886 },
+  "Founty / Agadir Beach": { x: 92, y: 890 },
+  "Agadir Marina": { x: 91, y: 874 },
+  "Anza": { x: 82, y: 861 },
+  "Aourir / Banana Village": { x: 84, y: 849 },
+  "Tamraght": { x: 86, y: 840 },
+  "Taghazout": { x: 88, y: 862 },
+  "Taghazout Bay": { x: 88, y: 862 },
+  "Imi Ouaddar": { x: 90, y: 830 },
+  "Inezgane": { x: 107, y: 904 },
+  "Aït Melloul": { x: 114, y: 919 },
+  "Dcheira El Jihadia": { x: 105, y: 902 },
+  "Drarga": { x: 116, y: 886 },
+  "Biougra": { x: 137, y: 938 },
+  "Paradise Valley": { x: 125, y: 814 },
   "Marrakech Centre-Ville": { x: 286, y: 706 },
   "Marrakech Centre-Ville (Riad / Hôtel)": { x: 286, y: 706 },
   "Casablanca Centre-Ville": { x: 331, y: 414 },
@@ -88,6 +104,20 @@ export const LATLNG_POSITIONS: Record<string, LatLng> = {
   // Cities
   "Agadir Centre-Ville": { lat: 30.4278, lng: -9.5981 },
   "Agadir Centre-Ville (Hôtel / Adresse de votre choix)": { lat: 30.4278, lng: -9.5981 },
+  "Founty / Agadir Beach": { lat: 30.4058, lng: -9.6037 },
+  "Agadir Marina": { lat: 30.4262, lng: -9.6280 },
+  "Anza": { lat: 30.4550, lng: -9.6400 },
+  "Aourir / Banana Village": { lat: 30.4924, lng: -9.6356 },
+  "Tamraght": { lat: 30.5100, lng: -9.6800 },
+  "Taghazout": { lat: 30.5445, lng: -9.7098 },
+  "Taghazout Bay": { lat: 30.5460, lng: -9.7080 },
+  "Imi Ouaddar": { lat: 30.5936, lng: -9.7567 },
+  "Inezgane": { lat: 30.3550, lng: -9.5370 },
+  "Aït Melloul": { lat: 30.3342, lng: -9.4973 },
+  "Dcheira El Jihadia": { lat: 30.3805, lng: -9.5350 },
+  "Drarga": { lat: 30.4200, lng: -9.5000 },
+  "Biougra": { lat: 30.2130, lng: -9.3690 },
+  "Paradise Valley": { lat: 30.5900, lng: -9.5000 },
   "Marrakech Centre-Ville": { lat: 31.6295, lng: -7.9811 },
   "Marrakech Centre-Ville (Riad / Hôtel)": { lat: 31.6295, lng: -7.9811 },
   "Casablanca Centre-Ville": { lat: 33.5731, lng: -7.5898 },
@@ -122,6 +152,8 @@ export function getLatLng(label: string): LatLng {
     (k) => k.toLowerCase() === label.trim().toLowerCase(),
   );
   if (key) return LATLNG_POSITIONS[key];
-  // Default to Agadir
+  const catalogLocation = findLocationByLabel(label);
+  if (catalogLocation) return { lat: catalogLocation.lat, lng: catalogLocation.lng };
+  // Default to Agadir only for a truly unknown free-text address.
   return { lat: 30.4278, lng: -9.5981 };
 }

@@ -49,6 +49,8 @@ export function priceForTier(row: TariffRow, tier: VehicleTier): number {
 export type ZoneId =
   | 'agadir-airport'
   | 'agadir-city'
+  | 'anza'
+  | 'biougra'
   | 'aourir'
   | 'tamraght'
   | 'taghazout'
@@ -79,6 +81,7 @@ export const ZONES: Zone[] = [
   { id: 'marrakech-airport', label: 'Marrakech Menara Airport', keywords: ['marrakech ménara', 'marrakech menara', 'rak)', 'marrakech airport', 'aéroport marrakech', 'aeroport marrakech'] },
   { id: 'taghazout-bay', label: 'Taghazout Bay', keywords: ['taghazout bay', 'hyatt', 'fairmont'] },
   { id: 'taghazout', label: 'Taghazout', keywords: ['taghazout'] },
+  { id: 'anza', label: 'Anza', keywords: ['anza'] },
   { id: 'tamraght', label: 'Tamraght', keywords: ['tamraght'] },
   { id: 'aourir', label: 'Aourir / Banana Village', keywords: ['aourir', 'banana village', 'banana point'] },
   { id: 'imi-ouaddar', label: 'Imi Ouaddar', keywords: ['imi ouaddar', 'imi-ouaddar'] },
@@ -88,11 +91,12 @@ export const ZONES: Zone[] = [
   { id: 'mirleft', label: 'Mirleft', keywords: ['mirleft'] },
   { id: 'tiznit', label: 'Tiznit', keywords: ['tiznit'] },
   { id: 'taroudant', label: 'Taroudant', keywords: ['taroudant'] },
+  { id: 'biougra', label: 'Biougra', keywords: ['biougra'] },
   { id: 'essaouira', label: 'Essaouira', keywords: ['essaouira', 'mogador', 'esu)'] },
   { id: 'agafay', label: 'Agafay Desert', keywords: ['agafay'] },
   { id: 'ourika', label: 'Ourika Valley', keywords: ['ourika'] },
   { id: 'marrakech-city', label: 'Marrakech', keywords: ['marrakech'] },
-  { id: 'agadir-city', label: 'Agadir', keywords: ['agadir', 'anza', 'inezgane', 'founty'] },
+  { id: 'agadir-city', label: 'Agadir', keywords: ['agadir', 'agadir centre-ville', 'agadir marina', 'inezgane', 'founty', 'aït melloul', 'ait melloul', 'dcheira', 'drarga'] },
 ];
 
 export function findZone(location: string): ZoneId | null {
@@ -127,6 +131,8 @@ const row = (
 /** Section 3 & 4 — Agadir Airport, Agadir city and the surf coast. */
 export const AGADIR_ROUTES: FixedRoute[] = [
   { from: 'agadir-airport', to: 'agadir-city', duration: '30–35 min', prices: row(22, 25, 30, 45, 55) },
+  { from: 'agadir-airport', to: 'anza', duration: '30–35 min', prices: row(25, 28, 35, 50, 60) },
+  { from: 'agadir-airport', to: 'biougra', duration: '40–50 min', prices: row(40, 45, 55, 75, 90) },
   { from: 'agadir-airport', to: 'aourir', duration: '35–45 min', prices: row(25, 28, 35, 50, 60) },
   { from: 'agadir-airport', to: 'tamraght', duration: '45–50 min', prices: row(30, 32, 38, 55, 65) },
   { from: 'agadir-airport', to: 'taghazout', duration: '45–55 min', prices: row(30, 32, 38, 55, 65) },
@@ -141,10 +147,13 @@ export const AGADIR_ROUTES: FixedRoute[] = [
   { from: 'agadir-airport', to: 'essaouira', duration: 'about 3h', prices: row(100, 110, 125, 160, 190) },
   { from: 'agadir-airport', to: 'marrakech-city', duration: 'about 3h', prices: row(120, 130, 145, 175, 210) },
 
+  { from: 'agadir-city', to: 'anza', duration: '15–20 min', prices: row(20, 25, 30, 45, 55) },
+  { from: 'agadir-city', to: 'biougra', duration: '35–45 min', prices: row(35, 40, 50, 70, 85) },
   { from: 'agadir-city', to: 'aourir', duration: '20–25 min', prices: row(25, 28, 35, 50, 60) },
   { from: 'agadir-city', to: 'tamraght', duration: '25–30 min', prices: row(25, 30, 35, 50, 60) },
   { from: 'agadir-city', to: 'taghazout', duration: '30–35 min', prices: row(25, 30, 35, 50, 60) },
   { from: 'agadir-city', to: 'taghazout-bay', duration: '30–35 min', prices: row(25, 30, 35, 50, 60) },
+  { from: 'agadir-city', to: 'imi-ouaddar', duration: 'about 1h', prices: row(40, 45, 55, 75, 90) },
   { from: 'agadir-city', to: 'paradise-valley', duration: 'about 1h', prices: row(50, 55, 65, 90, 105) },
   { from: 'agadir-city', to: 'taroudant', duration: 'about 1h', prices: row(45, 50, 60, 85, 100) },
   { from: 'agadir-city', to: 'imsouane', duration: 'about 1h45', prices: row(75, 80, 95, 115, 135) },
@@ -152,6 +161,23 @@ export const AGADIR_ROUTES: FixedRoute[] = [
   { from: 'agadir-city', to: 'tiznit', duration: 'about 1h30', prices: row(70, 75, 90, 110, 130) },
   { from: 'agadir-city', to: 'essaouira', duration: 'about 3h', prices: row(100, 110, 125, 160, 190) },
   { from: 'agadir-city', to: 'marrakech-city', duration: 'about 3h', prices: row(120, 130, 145, 175, 210) },
+
+  // Common short coastal hops. These fixed rows prevent hotel-to-hotel selections from using a misleading generic band.
+  { from: 'anza', to: 'aourir', duration: '25–30 min', prices: row(25, 28, 35, 50, 60) },
+  { from: 'anza', to: 'tamraght', duration: '30–35 min', prices: row(25, 30, 35, 50, 60) },
+  { from: 'anza', to: 'taghazout', duration: '35–45 min', prices: row(30, 32, 38, 55, 65) },
+  { from: 'anza', to: 'taghazout-bay', duration: '35–45 min', prices: row(30, 32, 38, 55, 65) },
+  { from: 'anza', to: 'imi-ouaddar', duration: 'about 1h', prices: row(40, 45, 55, 75, 90) },
+  { from: 'aourir', to: 'tamraght', duration: '15–20 min', prices: row(20, 25, 30, 45, 55) },
+  { from: 'aourir', to: 'taghazout', duration: '20–30 min', prices: row(25, 30, 35, 50, 60) },
+  { from: 'aourir', to: 'taghazout-bay', duration: '20–30 min', prices: row(25, 30, 35, 50, 60) },
+  { from: 'aourir', to: 'imi-ouaddar', duration: '35–45 min', prices: row(30, 35, 42, 65, 80) },
+  { from: 'tamraght', to: 'taghazout', duration: '15–20 min', prices: row(20, 25, 30, 45, 55) },
+  { from: 'tamraght', to: 'taghazout-bay', duration: '15–20 min', prices: row(20, 25, 30, 45, 55) },
+  { from: 'tamraght', to: 'imi-ouaddar', duration: '30–40 min', prices: row(30, 35, 42, 65, 80) },
+  { from: 'taghazout', to: 'taghazout-bay', duration: '10–15 min', prices: row(20, 25, 30, 45, 55) },
+  { from: 'taghazout', to: 'imi-ouaddar', duration: '20–30 min', prices: row(20, 25, 30, 45, 55) },
+  { from: 'taghazout-bay', to: 'imi-ouaddar', duration: '20–30 min', prices: row(20, 25, 30, 45, 55) },
 
   { from: 'taghazout', to: 'marrakech-city', duration: 'about 3h45', prices: row(130, 140, 160, 210, 250) },
   { from: 'tamraght', to: 'marrakech-city', duration: 'about 3h45', prices: row(130, 140, 160, 210, 250) },
