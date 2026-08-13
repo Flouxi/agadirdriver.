@@ -1,9 +1,9 @@
 export const AGADIR_DRIVER_LOGO_URL = '/agadir-driver-logo.png';
 export const HOMEPAGE_HERO_IMAGE_URL = '/hero-desktop-v2.webp';
-export const HOMEPAGE_HERO_MOBILE_IMAGE_URL = '/hero-mobile-v2.jpeg';
+export const HOMEPAGE_HERO_MOBILE_IMAGE_URL = '/hero-mobile-v2.webp';
 export const APP_MOCKUP_IMAGE_URL = '/app-mockup-v2.png';
-export const INFO_SECTION_PRIMARY_IMAGE_URL = '/travel-couple.jpg';
-export const INFO_SECTION_SECONDARY_IMAGE_URL = '/luxury-van.jpg';
+export const INFO_SECTION_PRIMARY_IMAGE_URL = '/travel-couple.webp';
+export const INFO_SECTION_SECONDARY_IMAGE_URL = '/luxury-van.webp';
 
 export const VEHICLE_IMAGE_URLS = {
   standard: 'https://images.transfeero.com/41bf3efc-6a0e-4725-6547-d6f88cd68b00/public',
