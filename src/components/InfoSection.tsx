@@ -1,36 +1,64 @@
-import React from 'react';
-import { Sparkles, Compass, CheckCircle2, Map, Users, Milestone } from 'lucide-react';
+import { Check } from 'lucide-react';
 import { INFO_SECTION_PRIMARY_IMAGE_URL, INFO_SECTION_SECONDARY_IMAGE_URL } from '../lib/brand-images';
+import Reveal from './Reveal';
+
+const STATS = [
+  { value: '12+', label: 'Régions' },
+  { value: '50+', label: 'Villes' },
+  { value: '10+', label: 'Aéroports' },
+  { value: '∞', label: 'Itinéraires' },
+];
+
+const GUARANTEES = [
+  "Annulation gratuite 24h à l'avance",
+  '60 minutes d\u2019attente gratuite aux aéroports',
+  'Chauffeurs locaux certifiés bilingues',
+  'Pas de frais cachés, prix garantis',
+];
+
+const STEPS = [
+  {
+    n: '1',
+    title: 'Indiquez votre itinéraire',
+    body: "Saisissez vos adresses de départ et d'arrivée, dates, heures et choisissez la classe de véhicule idéale.",
+  },
+  {
+    n: '2',
+    title: 'Complétez la réservation',
+    body: 'Saisissez les coordonnées du passager principal, le numéro de vol pour le suivi et procédez au paiement sécurisé.',
+  },
+  {
+    n: '3',
+    title: 'Rencontrez votre chauffeur',
+    body: 'Recevez le contact de votre chauffeur 6h avant la course. Il vous attend avec une pancarte nominative à l\u2019aéroport.',
+  },
+];
 
 export default function InfoSection() {
   return (
-    <section className="py-16 bg-[#F9FAFB] space-y-24 border-b border-gray-100">
-      
-      {/* Block 1: Couple Walking (Left) & Coverage Text (Right) */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-          
-          {/* Image Container */}
-          <div className="lg:col-span-5 relative group">
-            <div className="absolute -inset-1.5 bg-gradient-to-r from-yellow-500/30 to-amber-500/30 rounded-3xl blur-md opacity-70 group-hover:opacity-100 transition-opacity"></div>
+    <>
+      {/* Block 1 — coverage */}
+      <section className="section-y-sm bg-surface-alt lg:section-y lg:bg-surface">
+        <div className="shell grid grid-cols-1 items-center gap-8 sm:gap-12 lg:grid-cols-12 lg:gap-16">
+          <Reveal className="lg:col-span-5">
             <img
               src={INFO_SECTION_PRIMARY_IMAGE_URL}
               alt="Chauffeur accueillant un couple de voyageurs élégants à Agadir"
-              className="relative rounded-2xl w-full object-cover aspect-[4/3] shadow-lg"
+              loading="lazy"
+              className="aspect-4/5 w-full rounded-3xl object-cover shadow-soft sm:aspect-4/3 sm:rounded-xl"
               referrerPolicy="no-referrer"
             />
-          </div>
+          </Reveal>
 
-          {/* Text Container */}
-          <div className="lg:col-span-7 space-y-5">
-            <span className="text-[10px] font-bold text-[#EAB308] uppercase tracking-widest bg-gray-100 px-3 py-1 rounded-full border border-gray-200 inline-block font-mono">
+          <Reveal delay={90} className="lg:col-span-7">
+            <span className="text-[12px] font-semibold tracking-wide text-accent-strong uppercase sm:text-[13px]">
               Votre chauffeur personnel, à portée de main
             </span>
-            <h2 className="text-3xl sm:text-4xl font-black text-gray-900 tracking-tight font-display uppercase leading-tight">
+            <h2 className="mt-3 text-[2rem] leading-[1.08] font-extrabold tracking-[-0.03em] text-ink sm:mt-4 sm:text-4xl">
               Couverture nationale marocaine
             </h2>
-            
-            <div className="space-y-4 text-xs sm:text-sm text-gray-500 leading-relaxed font-medium">
+
+            <div className="mt-5 space-y-4 text-[15px] leading-relaxed text-ink/55 sm:mt-6 sm:text-[16px]">
               <p>
                 Réservez votre chauffeur privé en quelques secondes et profitez d'une expérience de voyage haut de gamme adaptée à votre emploi du temps marocain. Un transport fiable, confortable et sans stress est désormais plus facile que jamais de Casablanca à Dakhla. Arrivez à destination reposé, détendu et toujours à la minute près.
               </p>
@@ -39,50 +67,31 @@ export default function InfoSection() {
               </p>
             </div>
 
-            {/* Geometric separating element in gold */}
-            <div className="flex gap-1.5 py-2">
-              <div className="w-10 h-1 bg-[#EAB308] rounded-full"></div>
-              <div className="w-3 h-1 bg-[#0F1115] rounded-full"></div>
+            <div className="mt-8 grid grid-cols-4 gap-3 border-t border-line pt-6 sm:mt-10 sm:gap-8 sm:pt-8">
+              {STATS.map((s) => (
+                <div key={s.label} className="min-w-0">
+                  <span className="block text-[12px] text-ink/50 sm:hidden">{s.label}</span>
+                  <span className="block text-[22px] font-bold tracking-[-0.03em] text-ink sm:text-[28px]">{s.value}</span>
+                  <span className="mt-0.5 hidden text-[13px] text-ink/50 sm:block">{s.label}</span>
+                </div>
+              ))}
             </div>
-
-            {/* Stats Row */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 pt-4 border-t border-gray-100">
-              <div>
-                <span className="block text-2xl font-black text-gray-900 font-mono">12+</span>
-                <span className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider">Régions</span>
-              </div>
-              <div>
-                <span className="block text-2xl font-black text-gray-900 font-mono">50+</span>
-                <span className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider">Villes</span>
-              </div>
-              <div>
-                <span className="block text-2xl font-black text-gray-900 font-mono">10+</span>
-                <span className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider">Aéroports</span>
-              </div>
-              <div>
-                <span className="block text-2xl font-black text-gray-900 font-mono">∞</span>
-                <span className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider">Itinéraires</span>
-              </div>
-            </div>
-          </div>
-
+          </Reveal>
         </div>
-      </div>
+      </section>
 
-      {/* Block 2: Text (Left) & Van Image (Right) */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-          
-          {/* Text Container */}
-          <div className="lg:col-span-7 space-y-5 order-2 lg:order-1">
-            <span className="text-[10px] font-bold text-[#EAB308] uppercase tracking-widest bg-gray-100 px-3 py-1 rounded-full border border-gray-200 inline-block font-mono">
+      {/* Block 2 — comfort */}
+      <section className="section-y-sm bg-surface lg:section-y lg:bg-surface-alt">
+        <div className="shell grid grid-cols-1 items-center gap-8 sm:gap-12 lg:grid-cols-12 lg:gap-16">
+          <Reveal className="order-2 lg:order-1 lg:col-span-7">
+            <span className="text-[12px] font-semibold tracking-wide text-accent-strong uppercase sm:text-[13px]">
               Voyagez confortablement, arrivez en toute confiance
             </span>
-            <h2 className="text-3xl sm:text-4xl font-black text-gray-900 tracking-tight font-display uppercase leading-tight">
+            <h2 className="mt-3 text-[2rem] leading-[1.08] font-extrabold tracking-[-0.03em] text-ink sm:mt-4 sm:text-4xl">
               Sans le moindre accroc
             </h2>
-            
-            <div className="space-y-4 text-xs sm:text-sm text-gray-500 leading-relaxed font-medium">
+
+            <div className="mt-5 space-y-4 text-[15px] leading-relaxed text-ink/55 sm:mt-6 sm:text-[16px]">
               <p>
                 Profitez du luxe d'un service de chauffeur privé conçu exclusivement pour répondre à vos exigences. Notre outil de réservation en ligne instantané rend vos trajets sans stress, vous permettant de vous concentrer sur vos loisirs ou vos impératifs professionnels.
               </p>
@@ -91,94 +100,59 @@ export default function InfoSection() {
               </p>
             </div>
 
-            <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs font-bold text-gray-700">
-              <li className="flex items-center gap-2">
-                <CheckCircle2 size={15} className="text-[#EAB308]" />
-                Annulation gratuite 24h à l'avance
-              </li>
-              <li className="flex items-center gap-2">
-                <CheckCircle2 size={15} className="text-[#EAB308]" />
-                60 minutes d'attente gratuite aux aéroports
-              </li>
-              <li className="flex items-center gap-2">
-                <CheckCircle2 size={15} className="text-[#EAB308]" />
-                Chauffeurs locaux certifiés bilingues
-              </li>
-              <li className="flex items-center gap-2">
-                <CheckCircle2 size={15} className="text-[#EAB308]" />
-                Pas de frais cachés, prix garantis
-              </li>
+            <ul className="mt-8 grid grid-cols-1 gap-3.5 sm:grid-cols-2">
+              {GUARANTEES.map((g) => (
+                <li key={g} className="flex items-start gap-2.5 text-[14px] font-medium text-ink/70">
+                  <Check size={16} strokeWidth={2} className="mt-0.5 shrink-0 text-accent-strong" />
+                  {g}
+                </li>
+              ))}
             </ul>
-          </div>
+          </Reveal>
 
-          {/* Image Container */}
-          <div className="lg:col-span-5 relative group order-1 lg:order-2">
-            <div className="absolute -inset-1.5 bg-gradient-to-r from-yellow-500/30 to-amber-500/30 rounded-3xl blur-md opacity-70 group-hover:opacity-100 transition-opacity"></div>
+          <Reveal delay={90} className="order-1 lg:order-2 lg:col-span-5">
             <img
               src={INFO_SECTION_SECONDARY_IMAGE_URL}
               alt="Mercedes Classe V haut de gamme garée devant un complexe hôtelier à Agadir"
-              className="relative rounded-2xl w-full object-cover aspect-[4/3] shadow-lg"
+              loading="lazy"
+              className="aspect-4/5 w-full rounded-3xl object-cover shadow-soft sm:aspect-4/3 sm:rounded-xl"
               referrerPolicy="no-referrer"
             />
-          </div>
-
+          </Reveal>
         </div>
-      </div>
+      </section>
 
-      {/* Block 3: Comment ça marche (3 Step guide) */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="bg-white rounded-3xl border border-gray-100 p-8 sm:p-12 shadow-sm">
-          <h3 className="text-xl sm:text-2xl font-black text-gray-900 tracking-tight font-display uppercase text-center mb-10">
-            Comment ça marche
-          </h3>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
-            {/* Visual connector lines on desktop */}
-            <div className="hidden md:block absolute top-6 left-1/6 right-1/6 h-0.5 bg-gray-100 z-0"></div>
+      {/* Block 3 — how it works */}
+      <section className="section-y-sm bg-surface lg:section-y">
+        <div className="shell">
+          <div className="rounded-3xl bg-surface-alt p-6 sm:rounded-none sm:bg-transparent sm:p-0">
+            <Reveal className="mx-auto max-w-2xl sm:text-center">
+              <h2 className="text-[1.65rem] font-extrabold tracking-[-0.03em] text-ink sm:text-4xl">
+                Comment ça marche
+              </h2>
+            </Reveal>
 
-            {/* Step 1 */}
-            <div className="space-y-3 text-center relative z-10">
-              <div className="w-12 h-12 bg-[#EAB308] text-[#0F1115] font-black font-mono text-base rounded-full flex items-center justify-center mx-auto shadow-md shadow-yellow-500/15">
-                1
-              </div>
-              <h4 className="font-extrabold text-sm text-gray-900 uppercase tracking-wide">
-                Indiquez votre itinéraire
-              </h4>
-              <p className="text-xs text-gray-400 font-medium leading-relaxed max-w-xs mx-auto">
-                Saisissez vos adresses de départ et d'arrivée, dates, heures et choisissez la classe de véhicule idéale.
-              </p>
+            <div className="mt-7 grid grid-cols-1 divide-y divide-line sm:mt-14 sm:grid-cols-1 sm:divide-y-0 md:grid-cols-3 md:gap-8">
+              {STEPS.map((step, i) => (
+                <Reveal key={step.n} delay={i * 90} className="py-6 first:pt-0 last:pb-0 sm:py-0">
+                  <div className="relative">
+                    <span className="block text-[13px] font-bold text-accent-strong sm:hidden">0{step.n}</span>
+                    <span className="hidden h-11 w-11 items-center justify-center rounded-full bg-ink text-[16px] font-semibold text-white sm:flex">
+                      {step.n}
+                    </span>
+                    <h3 className="mt-2.5 text-[17px] font-semibold tracking-[-0.015em] text-ink sm:mt-6 sm:text-[18px]">
+                      {step.title}
+                    </h3>
+                    <p className="mt-2 max-w-sm text-[14px] leading-relaxed text-ink/55 sm:mt-2.5 sm:text-[15px]">
+                      {step.body}
+                    </p>
+                  </div>
+                </Reveal>
+              ))}
             </div>
-
-            {/* Step 2 */}
-            <div className="space-y-3 text-center relative z-10">
-              <div className="w-12 h-12 bg-[#EAB308] text-[#0F1115] font-black font-mono text-base rounded-full flex items-center justify-center mx-auto shadow-md shadow-yellow-500/15">
-                2
-              </div>
-              <h4 className="font-extrabold text-sm text-gray-900 uppercase tracking-wide">
-                Complétez la réservation
-              </h4>
-              <p className="text-xs text-gray-400 font-medium leading-relaxed max-w-xs mx-auto">
-                Saisissez les coordonnées du passager principal, le numéro de vol pour le suivi et procédez au paiement sécurisé.
-              </p>
-            </div>
-
-            {/* Step 3 */}
-            <div className="space-y-3 text-center relative z-10">
-              <div className="w-12 h-12 bg-[#0F1115] text-[#EAB308] font-black text-base rounded-full flex items-center justify-center mx-auto shadow-md shadow-black/15">
-                ✓
-              </div>
-              <h4 className="font-extrabold text-sm text-gray-900 uppercase tracking-wide">
-                Rencontrez votre chauffeur
-              </h4>
-              <p className="text-xs text-gray-400 font-medium leading-relaxed max-w-xs mx-auto">
-                Recevez le contact de votre chauffeur 6h avant la course. Il vous attend avec une pancarte nominative à l'aéroport.
-              </p>
-            </div>
-
           </div>
         </div>
-      </div>
-
-    </section>
+      </section>
+    </>
   );
 }

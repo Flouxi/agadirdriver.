@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Globe, Users, Clock, ShieldCheck, ArrowRight, X } from 'lucide-react';
+import Reveal from './Reveal';
 
 interface FeatureCard {
   id: string;
@@ -20,7 +21,7 @@ export default function FeaturesGrid() {
       subtitle: "La région de Souss-Massa",
       description: "Où que vous alliez à Agadir, Taghazout, Essaouira ou Marrakech, Agadir Driver garantit votre confort tout au long du trajet.",
       detailedInfo: "Notre service couvre l'intégralité d'Agadir, la zone balnéaire de Taghazout Bay, les liaisons de surf ainsi que l'arrière-pays du Souss. Nos chauffeurs connaissent parfaitement les raccourcis locaux et les emplacements des grands resorts pour vous assurer une arrivée rapide et sans stress.",
-      icon: <Globe className="text-[#0F1115] w-6 h-6" />
+      icon: <Globe size={22} strokeWidth={1.5} />
     },
     {
       id: 'chauffeurs',
@@ -28,7 +29,7 @@ export default function FeaturesGrid() {
       subtitle: "Chauffeurs bilingues certifiés",
       description: "Nos chauffeurs professionnels, bilingues (français, anglais, arabe), discrets et attentionnés, assurent des courses irréprochables.",
       detailedInfo: "Tous nos conducteurs sont agréés pour le transport touristique de luxe par le Ministère du Transport marocain. Ils possèdent une assurance spéciale passagers illimitée, portent une tenue formelle soignée et sont formés pour s'adapter à toutes vos demandes de discrétion ou d'accompagnement.",
-      icon: <Users className="text-[#0F1115] w-6 h-6" />
+      icon: <Users size={22} strokeWidth={1.5} />
     },
     {
       id: 'hourly',
@@ -36,7 +37,7 @@ export default function FeaturesGrid() {
       subtitle: "Mise à disposition flexible",
       description: "Réservez un chauffeur privé à l'heure pour vos besoins de shopping, réunions d'affaires ou excursions touristiques.",
       detailedInfo: "La mise à disposition horaire vous permet d'avoir un véhicule haut de gamme et son chauffeur dédié restant à votre entière disposition. Idéal pour visiter la Kasbah d'Agadir Oufella, flâner au Souk El Had ou enchaîner des rendez-vous d'affaires sans vous soucier de chercher un nouveau taxi à chaque arrêt.",
-      icon: <Clock className="text-[#0F1115] w-6 h-6" />
+      icon: <Clock size={22} strokeWidth={1.5} />
     },
     {
       id: 'intercity',
@@ -44,93 +45,89 @@ export default function FeaturesGrid() {
       subtitle: "Liaisons longue distance",
       description: "Explorez le Maroc à tout moment, en tout lieu — voyages sécurisés entre Agadir, Marrakech, Casablanca ou Essaouira.",
       detailedInfo: "Évitez la fatigue des transports en commun ou de la location de voiture. Nos transferts longue distance par l'autoroute vous permettent de voyager de porte-à-porte dans un confort absolu. Bouteilles d'eau fraîche, connexion Wi-Fi haut débit et chargeurs de téléphones sont mis à votre disposition à bord.",
-      icon: <ShieldCheck className="text-[#0F1115] w-6 h-6" />
+      icon: <ShieldCheck size={22} strokeWidth={1.5} />
     }
   ];
 
   return (
-    <section className="py-12 bg-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        
-        {/* Responsive Grid layout */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {features.map((feat) => (
-            <div
-              key={feat.id}
-              className="bg-white border border-gray-100 hover:border-gray-900/10 rounded-2xl p-6 transition-all duration-300 shadow-sm hover:shadow-md flex flex-col justify-between group"
-            >
-              <div>
-                {/* Header Icon on Circle Background */}
-                <div className="flex justify-between items-start mb-6">
-                  <div className="w-12 h-12 rounded-xl bg-gray-50 flex items-center justify-center border border-gray-100 group-hover:bg-[#EAB308] group-hover:border-[#EAB308] transition-colors duration-300">
+    <section className="section-y-sm bg-surface lg:section-y">
+      <div className="shell">
+        <Reveal className="max-w-2xl">
+          <h2 className="text-[1.9rem] leading-[1.08] font-extrabold tracking-[-0.03em] text-ink sm:text-4xl">
+            Nos services
+          </h2>
+          <p className="mt-2.5 text-[15px] leading-relaxed text-ink/55 sm:mt-3 sm:text-[16px]">
+            Un chauffeur privé pour chaque trajet, de l'aéroport aux longues distances.
+          </p>
+        </Reveal>
+
+        <div
+          className="-mx-5 mt-7 flex snap-x snap-mandatory gap-4 overflow-x-auto px-5 pb-2 sm:mx-0 sm:mt-12 sm:grid sm:grid-cols-2 sm:gap-6 sm:overflow-visible sm:px-0 lg:grid-cols-4"
+          style={{ scrollbarWidth: 'none' }}
+        >
+          {features.map((feat, i) => (
+            <Reveal key={feat.id} delay={i * 70} className="w-[80%] shrink-0 snap-start sm:w-auto sm:shrink">
+              <div className="card-lift flex h-full flex-col justify-between rounded-3xl border-line bg-surface-alt p-6 sm:rounded-xl sm:border sm:bg-surface sm:shadow-soft">
+                <div>
+                  <div className="flex h-11 w-11 items-center justify-center rounded-full bg-surface text-ink sm:rounded-xl sm:bg-surface-alt">
                     {feat.icon}
                   </div>
-                  <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest bg-gray-50 px-2 py-0.5 rounded">
-                    Service
+
+                  <h3 className="mt-5 text-[18px] font-bold tracking-[-0.01em] text-ink sm:mt-6 sm:text-[17px] sm:font-semibold">
+                    {feat.title}
+                  </h3>
+                  <span className="mt-1 block text-[13px] font-medium text-accent-strong">
+                    {feat.subtitle}
                   </span>
+                  <p className="mt-3 text-[14px] leading-relaxed text-ink/55">
+                    {feat.description}
+                  </p>
                 </div>
 
-                {/* Content */}
-                <h3 className="font-extrabold text-base text-gray-900 mb-1 group-hover:text-[#EAB308] transition-colors">
-                  {feat.title}
-                </h3>
-                <span className="block text-[11px] font-bold text-[#EAB308] mb-3 uppercase tracking-wide">
-                  {feat.subtitle}
-                </span>
-                <p className="text-xs text-gray-500 leading-relaxed font-medium">
-                  {feat.description}
-                </p>
-              </div>
-
-              {/* Action Trigger */}
-              <div className="border-t border-gray-100 pt-4 mt-6">
                 <button
                   type="button"
                   onClick={() => setSelectedFeature(feat)}
-                  className="w-full py-2.5 bg-gray-50 hover:bg-[#0F1115] hover:text-[#EAB308] text-gray-700 text-xs font-bold rounded-lg flex items-center justify-center gap-1 transition-all cursor-pointer"
+                  className="mt-6 flex w-fit cursor-pointer items-center gap-1.5 rounded-full bg-surface px-5 py-2.5 text-[14px] font-semibold text-ink shadow-soft transition-colors hover:text-accent-strong sm:bg-transparent sm:px-0 sm:py-0 sm:shadow-none"
                 >
                   <span>Détails</span>
-                  <ArrowRight size={13} className="group-hover:translate-x-0.5 transition-transform" />
+                  <ArrowRight size={16} strokeWidth={1.75} className="hidden sm:block" />
                 </button>
               </div>
-            </div>
+            </Reveal>
           ))}
         </div>
 
-        {/* Details Dialog Modal */}
+        {/* Details Dialog */}
         {selectedFeature && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs transition-opacity">
-            <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-gray-100 relative animate-in fade-in-50 zoom-in-95 duration-200">
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink/60 p-4 backdrop-blur-sm">
+            <div className="relative w-full max-w-md rounded-2xl border border-line bg-surface p-7 shadow-float">
               <button
                 onClick={() => setSelectedFeature(null)}
-                className="absolute top-4 right-4 text-gray-400 hover:text-gray-900 rounded-full p-1 hover:bg-gray-100"
+                className="absolute top-4 right-4 cursor-pointer rounded-full p-1.5 text-ink/40 transition-colors hover:bg-surface-alt hover:text-ink"
+                aria-label="Fermer"
               >
-                <X size={18} />
+                <X size={18} strokeWidth={1.75} />
               </button>
 
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 rounded-lg bg-[#EAB308] flex items-center justify-center">
+              <div className="flex items-center gap-3">
+                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-surface-alt text-ink">
                   {selectedFeature.icon}
                 </div>
                 <div>
-                  <h4 className="font-extrabold text-base text-gray-900">{selectedFeature.title}</h4>
-                  <span className="text-[10px] font-bold text-[#EAB308] uppercase">{selectedFeature.subtitle}</span>
+                  <h4 className="text-[17px] font-semibold text-ink">{selectedFeature.title}</h4>
+                  <span className="text-[13px] font-medium text-accent-strong">{selectedFeature.subtitle}</span>
                 </div>
               </div>
 
-              <div className="space-y-3.5 text-xs text-gray-600 leading-relaxed">
-                <p className="font-semibold text-gray-800">
-                  {selectedFeature.description}
-                </p>
-                <div className="p-3.5 bg-gray-50 rounded-xl border border-gray-100 text-gray-500 font-medium">
-                  {selectedFeature.detailedInfo}
-                </div>
+              <div className="mt-5 space-y-4 text-[14px] leading-relaxed">
+                <p className="font-medium text-ink">{selectedFeature.description}</p>
+                <p className="rounded-xl bg-surface-alt p-4 text-ink/60">{selectedFeature.detailedInfo}</p>
               </div>
 
               <div className="mt-6 flex justify-end">
                 <button
                   onClick={() => setSelectedFeature(null)}
-                  className="px-4 py-2.5 bg-[#0F1115] hover:bg-gray-800 text-[#EAB308] text-xs font-bold rounded-xl"
+                  className="cursor-pointer rounded-full bg-ink px-5 py-2.5 text-[14px] font-semibold text-white transition-colors hover:bg-ink-soft"
                 >
                   Fermer
                 </button>
@@ -138,7 +135,6 @@ export default function FeaturesGrid() {
             </div>
           </div>
         )}
-
       </div>
     </section>
   );

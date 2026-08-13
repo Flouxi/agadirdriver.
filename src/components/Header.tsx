@@ -1,241 +1,217 @@
-import { useEffect, useRef, useState } from "react";
-import { Link } from "@tanstack/react-router";
-import { Globe, Menu, X, ChevronDown, MessageCircle, Check } from "lucide-react";
-import Logo from "./Logo";
+import { useState } from 'react';
+import { Globe, User, Menu, X, ChevronDown, Phone } from 'lucide-react';
+import { AGADIR_DRIVER_LOGO_URL } from '../lib/brand-images';
+import { LANGUAGE_OPTIONS, useI18n } from '../lib/i18n';
 
 interface HeaderProps {
-  /** Called with a section id when a nav item is activated (homepage only). */
   onNavClick?: (section: string) => void;
 }
 
-const NAV_ITEMS = [
-  { label: "Transfert aéroport", id: "airport" },
-  { label: "Ville à ville", id: "intercity" },
-  { label: "À l'heure", id: "hourly" },
-  { label: "Destinations", id: "destinations" },
-  { label: "Aide", id: "help" },
-];
-
-const LANGUAGES = [
-  { code: "FR", label: "Français" },
-  { code: "EN", label: "English" },
-  { code: "DE", label: "Deutsch" },
-  { code: "ES", label: "Español" },
-];
-
-const WHATSAPP_LINK =
-  "https://wa.me/2120606419700?text=Bonjour%20Agadir%20Driver%2C%20j%27ai%20besoin%20d%27aide%20pour%20mon%20transport.";
-
 export default function Header({ onNavClick }: HeaderProps) {
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [langOpen, setLangOpen] = useState(false);
-  const [lang, setLang] = useState("FR");
-  const langRef = useRef<HTMLDivElement>(null);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [langDropdownOpen, setLangDropdownOpen] = useState(false);
+  const [userDropdownOpen, setUserDropdownOpen] = useState(false);
+  const { lang: currentLang, setLang: setCurrentLang, t } = useI18n();
+  const whatsappLink = 'https://wa.me/2120606419700?text=Bonjour%20Agadir%20Driver%2C%20j%27ai%20besoin%20d%27aide%20pour%20mon%20transport.';
 
-  // Close the language menu on outside click / Escape.
-  useEffect(() => {
-    if (!langOpen) return;
-    const onPointer = (e: MouseEvent) => {
-      if (langRef.current && !langRef.current.contains(e.target as Node)) setLangOpen(false);
-    };
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setLangOpen(false);
-    document.addEventListener("mousedown", onPointer);
-    document.addEventListener("keydown", onKey);
-    return () => {
-      document.removeEventListener("mousedown", onPointer);
-      document.removeEventListener("keydown", onKey);
-    };
-  }, [langOpen]);
+  const navItems = [
+    { label: t('nav.airport'), id: 'airport' },
+    { label: t('nav.intercity'), id: 'intercity' },
+    { label: t('nav.hourly'), id: 'hourly' },
+    { label: t('nav.help'), id: 'help' },
+    { label: t('nav.business'), id: 'business' }
+  ];
 
-  // Lock body scroll while the mobile drawer is open.
-  useEffect(() => {
-    if (!menuOpen) return;
-    const previous = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setMenuOpen(false);
-    document.addEventListener("keydown", onKey);
-    return () => {
-      document.body.style.overflow = previous;
-      document.removeEventListener("keydown", onKey);
-    };
-  }, [menuOpen]);
+  const languageOptions = LANGUAGE_OPTIONS;
 
-  const handleNav = (id: string) => {
-    setMenuOpen(false);
-    onNavClick?.(id);
+  const handleItemClick = (id: string) => {
+    if (onNavClick) {
+      onNavClick(id);
+    }
+    setMobileMenuOpen(false);
   };
 
-  return (
-    <header className="sticky top-0 z-50 w-full border-b border-border bg-background">
-      <div className="mx-auto flex h-16 max-w-7xl items-center gap-6 px-4 sm:px-6 lg:px-8">
-        <Logo />
+  const langMenu = (
+    <div className="absolute right-0 mt-2 w-36 overflow-hidden rounded-xl border border-white/10 bg-ink-soft py-1 text-sm text-white/80 shadow-float z-[60]">
+      {languageOptions.map((lang) => (
+        <button
+          key={lang.code}
+          onClick={() => {
+            setCurrentLang(lang.code);
+            setLangDropdownOpen(false);
+          }}
+          className="block w-full px-4 py-2 text-left text-[13px] hover:bg-white/10 hover:text-white"
+        >
+          {lang.label}
+        </button>
+      ))}
+    </div>
+  );
 
-        <nav aria-label="Navigation principale" className="hidden items-center gap-1 lg:flex">
-          {NAV_ITEMS.map((item) =>
-            onNavClick ? (
+  return (
+    <header className="sticky top-0 z-[9999] w-full isolate bg-ink text-white">
+      {/* Utility bar — muted, single line, no visual noise */}
+      <div className="hidden border-b border-white/8 sm:block">
+        <div className="shell flex items-center justify-between py-2 text-[12px] text-white/55">
+          <div className="flex items-center gap-5">
+            <span className="flex items-center gap-2">
+              <span className="h-1.5 w-1.5 rounded-full bg-accent" />
+              {t('top.support')}
+            </span>
+            <a
+              href={whatsappLink}
+              target="_blank"
+              rel="noreferrer"
+              className="flex items-center gap-1.5 transition-colors hover:text-white"
+            >
+              <Phone size={12} className="text-accent" />
+              +212 060 641 9700
+            </a>
+          </div>
+          <div className="flex items-center gap-4">
+            <span className="cursor-pointer transition-colors hover:text-white">{t('top.driver')}</span>
+            <span className="cursor-pointer transition-colors hover:text-white">{t('top.agency')}</span>
+          </div>
+        </div>
+      </div>
+
+      <div className="shell">
+        <div className="flex h-16 items-center gap-6 sm:h-[72px]">
+          {/* Logo */}
+          <button
+            type="button"
+            onClick={() => handleItemClick('hero')}
+            className="flex shrink-0 items-center cursor-pointer"
+            aria-label="Agadir Driver — accueil"
+          >
+            <img
+              src={AGADIR_DRIVER_LOGO_URL}
+              alt="Agadir Driver"
+              className="h-11 w-auto max-w-[200px] object-contain sm:h-[72px] sm:max-w-[280px]"
+            />
+          </button>
+
+          {/* Desktop nav */}
+          <nav className="hidden min-w-0 items-center gap-7 text-[14px] font-medium text-white/75 lg:flex">
+            {navItems.map((item) => (
               <button
                 key={item.id}
-                type="button"
-                onClick={() => handleNav(item.id)}
-                className="cursor-pointer rounded-lg px-3 py-2 text-[15px] font-medium text-foreground transition-colors hover:bg-muted"
+                onClick={() => handleItemClick(item.id)}
+                className="group relative cursor-pointer py-2 whitespace-nowrap transition-colors hover:text-white"
               >
                 {item.label}
+                <span className="absolute -bottom-0.5 left-0 h-[2px] w-0 bg-accent transition-all duration-300 group-hover:w-full" />
               </button>
-            ) : (
-              <Link
-                key={item.id}
-                to="/"
-                hash={item.id}
-                className="rounded-lg px-3 py-2 text-[15px] font-medium text-foreground transition-colors hover:bg-muted"
+            ))}
+          </nav>
+
+          <div className="ml-auto flex shrink-0 items-center gap-2 sm:gap-3">
+            {/* Language (desktop) */}
+            <div className="relative hidden lg:block">
+              <button
+                onClick={() => {
+                  setLangDropdownOpen(!langDropdownOpen);
+                  setMobileMenuOpen(false);
+                  setUserDropdownOpen(false);
+                }}
+                className="flex cursor-pointer items-center gap-1.5 rounded-full px-2.5 py-2 text-[13px] font-medium text-white/70 transition-colors hover:bg-white/8 hover:text-white"
+                aria-label={t('header.langAria')}
               >
-                {item.label}
-              </Link>
-            ),
-          )}
-        </nav>
+                <Globe size={16} strokeWidth={1.75} />
+                <span>{currentLang}</span>
+                <ChevronDown
+                  size={14}
+                  strokeWidth={1.75}
+                  className={`transition-transform ${langDropdownOpen ? 'rotate-180' : ''}`}
+                />
+              </button>
+              {langDropdownOpen && langMenu}
+            </div>
 
-        <div className="ml-auto flex items-center gap-1 sm:gap-2">
-          <a
-            href={WHATSAPP_LINK}
-            target="_blank"
-            rel="noreferrer"
-            className="hidden items-center gap-2 rounded-lg px-3 py-2 text-[15px] font-medium text-foreground transition-colors hover:bg-muted xl:flex"
-          >
-            <MessageCircle size={16} strokeWidth={2} aria-hidden="true" />
-            Assistance 24/7
-          </a>
-
-          <div ref={langRef} className="relative">
-            <button
-              type="button"
-              onClick={() => setLangOpen((v) => !v)}
-              aria-haspopup="menu"
-              aria-expanded={langOpen}
-              className="flex cursor-pointer items-center gap-1.5 rounded-lg px-2.5 py-2 text-[15px] font-medium text-foreground transition-colors hover:bg-muted"
-            >
-              <Globe size={16} strokeWidth={2} aria-hidden="true" />
-              <span>{lang}</span>
-              <ChevronDown
-                size={14}
-                aria-hidden="true"
-                className={`transition-transform ${langOpen ? "rotate-180" : ""}`}
-              />
-            </button>
-
-            {langOpen && (
-              <div
-                role="menu"
-                className="absolute right-0 z-50 mt-2 w-44 overflow-hidden rounded-xl border border-border bg-popover py-1 shadow-lg"
+            {/* User menu */}
+            <div className="relative">
+              <button
+                onClick={() => {
+                  setUserDropdownOpen(!userDropdownOpen);
+                  setLangDropdownOpen(false);
+                  setMobileMenuOpen(false);
+                }}
+                className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-xl border border-white/20 text-white/85 transition-colors hover:bg-white/10 hover:text-white sm:h-11 sm:w-11"
+                aria-label={t('header.login')}
+                aria-expanded={userDropdownOpen}
               >
-                {LANGUAGES.map((l) => (
-                  <button
-                    key={l.code}
-                    type="button"
-                    role="menuitemradio"
-                    aria-checked={lang === l.code}
-                    onClick={() => {
-                      setLang(l.code);
-                      setLangOpen(false);
-                    }}
-                    className="flex w-full cursor-pointer items-center justify-between px-3.5 py-2.5 text-left text-sm font-medium text-popover-foreground transition-colors hover:bg-muted"
-                  >
-                    {l.label}
-                    {lang === l.code && <Check size={14} aria-hidden="true" />}
+                <User size={20} strokeWidth={1.75} />
+              </button>
+              {userDropdownOpen && (
+                <div className="absolute right-0 mt-2 w-44 overflow-hidden rounded-xl border border-white/10 bg-ink-soft py-2 text-sm text-white/80 shadow-float z-[60]">
+                  <button className="block w-full px-4 py-2.5 text-left text-[13px] font-medium hover:bg-white/10 hover:text-white">
+                    {t('header.login')}
                   </button>
-                ))}
-              </div>
-            )}
+                  <button className="block w-full px-4 py-2.5 text-left text-[13px] font-medium hover:bg-white/10 hover:text-white">
+                    {t('header.signup')}
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* Mobile trigger */}
+            <button
+              onClick={() => {
+                setMobileMenuOpen(!mobileMenuOpen);
+                setLangDropdownOpen(false);
+                setUserDropdownOpen(false);
+              }}
+              className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-xl border border-white/20 text-white/85 transition-colors hover:bg-white/10 hover:text-white lg:hidden"
+              aria-label="Ouvrir le menu"
+              aria-expanded={mobileMenuOpen}
+            >
+              {mobileMenuOpen ? <X size={20} strokeWidth={2} /> : <Menu size={20} strokeWidth={2} />}
+            </button>
           </div>
-
-          <button
-            type="button"
-            className="hidden cursor-pointer rounded-lg px-3 py-2 text-[15px] font-medium text-foreground transition-colors hover:bg-muted lg:block"
-          >
-            Se connecter
-          </button>
-
-          <button
-            type="button"
-            onClick={() => handleNav("booking")}
-            className="hidden cursor-pointer rounded-lg bg-primary px-4 py-2.5 text-[15px] font-semibold text-primary-foreground transition-opacity hover:opacity-85 sm:block"
-          >
-            Réserver
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setMenuOpen(true)}
-            aria-label="Ouvrir le menu"
-            aria-expanded={menuOpen}
-            className="-mr-2 cursor-pointer rounded-lg p-2.5 text-foreground transition-colors hover:bg-muted lg:hidden"
-          >
-            <Menu size={22} aria-hidden="true" />
-          </button>
         </div>
       </div>
 
       {/* Mobile drawer */}
-      {menuOpen && (
-        <div className="fixed inset-0 z-[60] lg:hidden">
-          <button
-            type="button"
-            aria-label="Fermer le menu"
-            onClick={() => setMenuOpen(false)}
-            className="absolute inset-0 cursor-default bg-foreground/40"
-          />
-          <div
-            role="dialog"
-            aria-modal="true"
-            aria-label="Menu"
-            className="absolute inset-y-0 right-0 flex w-[86%] max-w-sm flex-col bg-background shadow-2xl"
-          >
-            <div className="flex h-16 shrink-0 items-center justify-between border-b border-border px-4">
-              <Logo />
+      {mobileMenuOpen && (
+        <div className="absolute top-full left-0 w-full border-b border-white/10 bg-ink shadow-float lg:hidden">
+          <div className="shell space-y-1 py-4">
+            {navItems.map((item) => (
               <button
-                type="button"
-                onClick={() => setMenuOpen(false)}
-                aria-label="Fermer le menu"
-                className="-mr-2 cursor-pointer rounded-lg p-2.5 text-foreground transition-colors hover:bg-muted"
+                key={item.id}
+                onClick={() => handleItemClick(item.id)}
+                className="block w-full cursor-pointer rounded-xl px-3 py-3 text-left text-[15px] font-medium text-white/85 transition-colors hover:bg-white/8 hover:text-white"
               >
-                <X size={22} aria-hidden="true" />
+                {item.label}
               </button>
-            </div>
-
-            <nav aria-label="Navigation mobile" className="flex-1 overflow-y-auto px-3 py-4">
-              {NAV_ITEMS.map((item) => (
-                <button
-                  key={item.id}
-                  type="button"
-                  onClick={() => handleNav(item.id)}
-                  className="block w-full cursor-pointer rounded-lg px-3 py-3.5 text-left text-[19px] font-semibold tracking-tight text-foreground transition-colors hover:bg-muted"
-                >
-                  {item.label}
-                </button>
-              ))}
-            </nav>
-
-            <div className="shrink-0 space-y-2.5 border-t border-border p-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
-              <button
-                type="button"
-                onClick={() => handleNav("booking")}
-                className="w-full cursor-pointer rounded-lg bg-primary py-3.5 text-[15px] font-semibold text-primary-foreground transition-opacity hover:opacity-85"
-              >
-                Réserver un trajet
-              </button>
-              <button
-                type="button"
-                className="w-full cursor-pointer rounded-lg bg-secondary py-3.5 text-[15px] font-semibold text-secondary-foreground transition-colors hover:bg-border"
-              >
-                Se connecter
-              </button>
+            ))}
+            <div className="mt-3 space-y-3 border-t border-white/10 pt-4">
+              <div className="flex flex-wrap gap-2">
+                {languageOptions.map((lang) => (
+                  <button
+                    key={lang.code}
+                    onClick={() => setCurrentLang(lang.code)}
+                    className={`cursor-pointer rounded-full border px-3.5 py-2 text-[13px] font-medium transition-colors ${
+                      currentLang === lang.code
+                        ? 'border-accent bg-accent/15 text-white'
+                        : 'border-white/15 text-white/65'
+                    }`}
+                  >
+                    {lang.label}
+                  </button>
+                ))}
+              </div>
+              <div className="flex items-center justify-between px-1 text-[12px] text-white/50">
+                <span className="cursor-pointer hover:text-white">{t('top.driverShort')}</span>
+                <span className="cursor-pointer hover:text-white">{t('top.agency')}</span>
+              </div>
               <a
-                href={WHATSAPP_LINK}
+                href={whatsappLink}
                 target="_blank"
                 rel="noreferrer"
-                className="flex items-center justify-center gap-2 py-2 text-[13px] font-medium text-muted-foreground"
+                className="flex items-center gap-2 px-1 text-[12px] text-white/50 hover:text-white"
               >
-                <MessageCircle size={14} aria-hidden="true" />
-                Assistance 24/7 · +212 606 419 700
+                <Phone size={12} className="text-accent" />
+                {t('top.support')} · +212 060 641 9700
               </a>
             </div>
           </div>

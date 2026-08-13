@@ -20,22 +20,16 @@ export default function NewsletterSection() {
   };
 
   return (
-    <section className="py-12 bg-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        
-        {/* Black container matching design */}
-        <div className="bg-[#0F1115] rounded-[2rem] p-8 sm:p-12 lg:p-16 text-center relative overflow-hidden border border-gray-800">
-          
-          {/* Subtle background blur blobs */}
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[350px] h-[350px] bg-yellow-500/5 rounded-full blur-[80px] pointer-events-none"></div>
-
-          <div className="max-w-3xl mx-auto space-y-6 relative z-10">
-            <h2 className="text-2xl sm:text-4xl font-black tracking-tight text-white font-display leading-tight">
-              Abonnez-vous à la newsletter et <br className="hidden sm:inline" />
-              <span className="text-[#EAB308]">bénéficiez de 5 % de réduction</span> sur votre premier trajet !
+    <section className="section-y-sm bg-surface">
+      <div className="shell">
+        <div className="rounded-2xl bg-ink px-6 py-14 text-center sm:px-12 lg:px-16 lg:py-20">
+          <div className="mx-auto max-w-2xl">
+            <h2 className="text-3xl font-extrabold tracking-[-0.03em] text-white sm:text-[2.5rem] sm:leading-[1.1]">
+              Abonnez-vous à la newsletter et{' '}
+              <span className="text-accent">bénéficiez de 5 % de réduction</span> sur votre premier trajet !
             </h2>
-            
-            <p className="text-sm text-gray-300 font-medium max-w-xl mx-auto">
+
+            <p className="mx-auto mt-5 max-w-xl text-[16px] leading-relaxed text-white/60">
               Recevez les dernières actualités, conseils de voyage locaux pour le Maroc et offres exclusives directement dans votre boîte de réception.
             </p>
 
@@ -46,25 +40,27 @@ export default function NewsletterSection() {
                   initial={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
                   onSubmit={handleSubmit}
-                  className="flex flex-col sm:flex-row items-center gap-3 max-w-lg mx-auto pt-4"
+                  className="mx-auto mt-8 flex max-w-lg flex-col items-center gap-3 sm:flex-row"
                 >
-                  <div className="relative w-full flex items-center">
-                    <Mail size={16} className="absolute left-4 text-gray-400" />
+                  <div className="relative flex w-full items-center">
+                    <Mail size={17} strokeWidth={1.75} className="absolute left-4 text-white/40" />
+                    <label htmlFor="newsletter-email" className="sr-only">Adresse e-mail</label>
                     <input
+                      id="newsletter-email"
                       type="email"
                       placeholder="Saisissez votre adresse e-mail"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      className="w-full pl-11 pr-4 py-3.5 bg-gray-900 border border-gray-800 focus:border-[#EAB308] rounded-xl text-xs font-semibold text-white placeholder-gray-500 focus:outline-none transition-colors"
+                      className="w-full rounded-xl border border-white/15 bg-white/8 py-3.5 pr-4 pl-11 text-[15px] font-medium text-white transition-colors placeholder:text-white/40 focus:border-accent focus:outline-none"
                       required
                       disabled={loading}
                     />
                   </div>
-                  
+
                   <button
                     type="submit"
                     disabled={loading}
-                    className="w-full sm:w-auto px-8 py-3.5 bg-[#EAB308] hover:bg-[#CA8A04] text-[#0F1115] font-black rounded-xl text-xs uppercase tracking-wider shadow-lg shadow-yellow-500/10 active:scale-95 transition-all cursor-pointer shrink-0 disabled:opacity-50"
+                    className="w-full shrink-0 cursor-pointer rounded-xl bg-accent px-7 py-3.5 text-[15px] font-semibold text-accent-foreground transition-all hover:bg-accent-strong active:scale-[0.98] disabled:opacity-50 sm:w-auto"
                   >
                     {loading ? 'Inscription...' : "S'abonner"}
                   </button>
@@ -72,25 +68,23 @@ export default function NewsletterSection() {
               ) : (
                 <motion.div
                   key="success"
-                  initial={{ opacity: 0, scale: 0.95 }}
+                  initial={{ opacity: 0, scale: 0.97 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  className="bg-[#1e2330] border border-green-500/20 rounded-xl p-4 max-w-md mx-auto flex items-center justify-center gap-3"
+                  className="mx-auto mt-8 flex max-w-md items-center justify-center gap-3 rounded-xl border border-white/15 bg-white/8 p-5"
                 >
-                  <CheckCircle2 size={20} className="text-green-500 shrink-0" />
+                  <CheckCircle2 size={20} strokeWidth={1.75} className="shrink-0 text-trust" />
                   <div className="text-left">
-                    <span className="block text-xs font-bold text-white">Merci pour votre inscription !</span>
-                    <span className="block text-[10px] text-gray-400 font-semibold mt-0.5">Votre code promo de 5% arrive dans quelques instants.</span>
+                    <span className="block text-[15px] font-semibold text-white">Merci pour votre inscription !</span>
+                    <span className="mt-0.5 block text-[13px] text-white/55">Votre code promo de 5% arrive dans quelques instants.</span>
                   </div>
                 </motion.div>
               )}
             </AnimatePresence>
 
-            {/* Legal text footnotes */}
-            <p className="text-[10px] font-medium text-gray-500 leading-relaxed max-w-md mx-auto pt-4">
+            <p className="mx-auto mt-8 max-w-lg text-[12px] leading-relaxed text-white/40">
               En vous abonnant à la newsletter, vous acceptez notre politique de confidentialité. Nous ne vendrons ni ne partagerons jamais vos données avec des tiers. Promotion de bienvenue valable uniquement pour les nouveaux clients sur leur premier trajet réservé.
             </p>
           </div>
-
         </div>
       </div>
     </section>

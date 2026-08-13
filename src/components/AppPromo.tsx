@@ -1,190 +1,191 @@
-import React from 'react';
-import { Smartphone, Download, QrCode, Sparkles, Check, Bell } from 'lucide-react';
+import appMockup from '../assets/app-mockup-v2.png.asset.json';
+
+/* Procedural "city map" backdrop — grid streets + faint blocks + a route line */
+function MapBackdrop() {
+  const rand = (seed: number) => {
+    const x = Math.sin(seed) * 10000;
+    return x - Math.floor(x);
+  };
+
+  const hLines = Array.from({ length: 40 }, (_, i) => -320 + i * 33 + Math.round(rand(i) * 8));
+  const vLines = Array.from({ length: 40 }, (_, i) => -440 + i * 58 + Math.round(rand(i + 99) * 12));
+
+  const blocks = Array.from({ length: 150 }, (_, i) => {
+    const x = -300 + Math.round(rand(i * 3.1) * 1700);
+    const y = -200 + Math.round(rand(i * 7.7) * 900);
+    const w = 20 + Math.round(rand(i * 5.3) * 45);
+    const h = 18 + Math.round(rand(i * 2.9) * 30);
+    return { x, y, w, h };
+  });
+
+  return (
+    <svg
+      className="h-full w-full"
+      viewBox="0 0 1400 620"
+      fill="none"
+      preserveAspectRatio="xMidYMid slice"
+      aria-hidden="true"
+    >
+      <defs>
+        <radialGradient id="adMapFade" cx="50%" cy="48%" r="74%">
+          <stop offset="0%" stopColor="#fff" stopOpacity="1" />
+          <stop offset="58%" stopColor="#fff" stopOpacity=".9" />
+          <stop offset="88%" stopColor="#fff" stopOpacity=".25" />
+          <stop offset="100%" stopColor="#fff" stopOpacity="0" />
+        </radialGradient>
+        <mask id="adMapMask">
+          <rect width="1400" height="620" fill="url(#adMapFade)" />
+        </mask>
+        <linearGradient id="adMapFadeX" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stopColor="#fff" stopOpacity="0" />
+          <stop offset="26%" stopColor="#fff" stopOpacity="1" />
+          <stop offset="74%" stopColor="#fff" stopOpacity="1" />
+          <stop offset="100%" stopColor="#fff" stopOpacity="0" />
+        </linearGradient>
+        <mask id="adMapMaskX">
+          <rect width="1400" height="620" fill="url(#adMapFadeX)" />
+        </mask>
+      </defs>
+
+      <g mask="url(#adMapMask)">
+        <g mask="url(#adMapMaskX)">
+          <g transform="rotate(-21 700 310)">
+            <g stroke="rgba(255,255,255,0.1)" strokeWidth="0.9">
+              {hLines.map((y) => (
+                <path key={`h${y}`} d={`M-460 ${y} H1860`} />
+              ))}
+            </g>
+            <g stroke="rgba(255,255,255,0.15)" strokeWidth="1.25">
+              {vLines.map((x) => (
+                <path key={`v${x}`} d={`M${x} -340 V980`} />
+              ))}
+            </g>
+            <g stroke="rgba(255,255,255,0.21)" strokeWidth="2.1">
+              <path d="M-180 -340 V980" />
+              <path d="M232 -340 V980" />
+              <path d="M700 -340 V980" />
+              <path d="M1128 -340 V980" />
+              <path d="M1560 -340 V980" />
+              <path d="M-460 -40 H1860" />
+              <path d="M-460 310 H1860" />
+              <path d="M-460 660 H1860" />
+            </g>
+            <g fill="rgba(255,255,255,.05)" stroke="rgba(255,255,255,.12)" strokeWidth=".75">
+              {blocks.map((b, i) => (
+                <rect key={i} x={b.x} y={b.y} width={b.w} height={b.h} />
+              ))}
+            </g>
+
+            <path
+              d="M232 545 L232 470 L468 470 L468 400 L586 400 L586 310 L700 310"
+              stroke="rgba(249,175,0,.92)"
+              strokeWidth="3.4"
+              fill="none"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+            <circle cx="232" cy="545" r="4.6" fill="rgba(249,175,0,.85)" />
+          </g>
+
+          <circle cx="700" cy="310" r="20" fill="rgba(249,175,0,.12)" />
+          <circle cx="700" cy="310" r="12" fill="rgba(249,175,0,.26)" />
+          <circle cx="700" cy="310" r="6.5" fill="#f9b442" stroke="#0a0a0a" strokeWidth="2.2" />
+        </g>
+      </g>
+    </svg>
+  );
+}
 
 export default function AppPromo() {
   return (
-    <section className="py-12 bg-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        
-        {/* Container - Black Rounded Card */}
-        <div className="bg-[#0F1115] rounded-[2rem] p-8 sm:p-12 lg:p-16 text-white relative overflow-hidden shadow-2xl border border-gray-800 flex flex-col lg:flex-row gap-12 items-center">
-          
-          {/* Radial visual background decoration */}
-          <div className="absolute top-0 right-0 w-[450px] h-[450px] bg-yellow-500/5 rounded-full blur-[120px] pointer-events-none"></div>
-          <div className="absolute -bottom-20 -left-20 w-[300px] h-[300px] bg-yellow-500/5 rounded-full blur-[80px] pointer-events-none"></div>
+    <section id="app-download" className="shell relative pb-10 pt-12 sm:pt-16">
+      <div className="relative mx-auto max-w-7xl overflow-hidden rounded-3xl bg-neutral-950 text-white">
+        <div aria-hidden="true" className="pointer-events-none absolute inset-0">
+          <MapBackdrop />
+        </div>
 
-          {/* Left Text and Buttons Block */}
-          <div className="flex-1 space-y-6 z-10 max-w-xl">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-yellow-500/10 border border-yellow-500/20 text-[#EAB308] text-[11px] font-bold uppercase tracking-wider">
-              <Sparkles size={11} />
-              <span>Application Chauffeur Agadir Driver</span>
-            </div>
-            
-            <h2 className="text-3xl sm:text-4xl font-black tracking-tight font-display text-white leading-tight">
-              Prenez votre temps !
+        <div className="relative grid items-end gap-6 px-6 sm:px-10 md:grid-cols-2 md:gap-10 lg:px-20">
+          <div className="order-1 flex flex-col items-center pt-12 text-center md:order-1 md:items-start md:py-16 md:text-left">
+            <h2 className="text-pretty text-4xl leading-tight font-bold tracking-tight text-white md:text-4xl lg:text-5xl">
+              Prenez la route sereinement&nbsp;!
             </h2>
-            
-            <p className="text-sm text-gray-300 font-medium leading-relaxed">
-              Réservez, suivez votre chauffeur en temps réel, modifiez la date et l'heure, ou annulez vos trajets gratuitement jusqu'à 24 heures à l'avance directement depuis notre application mobile.
+            <p className="mt-4 max-w-xl text-neutral-300 md:text-lg">
+              Réservez, suivez votre chauffeur, modifiez la date et l’heure ou annulez vos trajets.
             </p>
 
-            {/* Checklist */}
-            <ul className="grid grid-cols-2 gap-3.5 text-xs font-semibold text-gray-300">
-              <li className="flex items-center gap-2">
-                <span className="w-4 h-4 rounded-full bg-yellow-500/20 text-[#EAB308] flex items-center justify-center text-[10px]">✓</span>
-                Suivi GPS en direct
-              </li>
-              <li className="flex items-center gap-2">
-                <span className="w-4 h-4 rounded-full bg-yellow-500/20 text-[#EAB308] flex items-center justify-center text-[10px]">✓</span>
-                Alertes SMS / Notifications
-              </li>
-              <li className="flex items-center gap-2">
-                <span className="w-4 h-4 rounded-full bg-yellow-500/20 text-[#EAB308] flex items-center justify-center text-[10px]">✓</span>
-                Chauffeur attitré
-              </li>
-              <li className="flex items-center gap-2">
-                <span className="w-4 h-4 rounded-full bg-yellow-500/20 text-[#EAB308] flex items-center justify-center text-[10px]">✓</span>
-                Paiement dématérialisé
-              </li>
-            </ul>
+            <div className="order-3 mt-10 hidden flex-wrap items-center gap-5 md:flex">
+              <figure className="flex flex-col items-center gap-2">
+                <img
+                  src="/app-qr.svg"
+                  alt="QR code — télécharger l'application Agadir Driver"
+                  loading="lazy"
+                  className="h-36 w-36 rounded-lg border border-white/10 bg-white/5 object-contain p-1 sm:h-44 sm:w-44"
+                />
+                <figcaption className="text-xs text-neutral-400">
+                  Télécharger l’application
+                </figcaption>
+              </figure>
 
-            {/* App Badges & QR Row */}
-            <div className="flex flex-col sm:flex-row items-center gap-6 pt-4 border-t border-gray-800">
-              
-              {/* Fake QR Code */}
-              <div className="flex items-center gap-3 bg-gray-900/60 p-3.5 rounded-2xl border border-gray-800">
-                <div className="w-16 h-16 bg-white p-1 rounded-lg flex items-center justify-center shrink-0">
-                  <QrCode size={52} className="text-[#0F1115]" />
-                </div>
-                <div>
-                  <span className="block text-xs font-bold text-white">Scanner le QR Code</span>
-                  <span className="block text-[10px] text-gray-400 font-medium mt-0.5">Téléchargement immédiat de l'App</span>
-                </div>
-              </div>
-
-              {/* Store Badges */}
-              <div className="flex flex-col gap-2.5 w-full sm:w-auto shrink-0">
-                <button
-                  type="button"
-                  className="flex items-center gap-3 px-4 py-2.5 bg-black hover:bg-gray-900 border border-gray-800 rounded-xl transition-all cursor-pointer w-full sm:w-44 text-left"
+              <div className="flex flex-col items-center gap-3">
+                <a
+                  href="#"
+                  className="rounded-md transition hover:opacity-85"
+                  title="Télécharger sur l'App Store"
                 >
-                  <Smartphone size={18} className="text-white" />
-                  <div>
-                    <span className="block text-[8px] text-gray-400 uppercase leading-none font-bold">Disponible sur l'</span>
-                    <span className="block text-xs font-bold text-white leading-tight">App Store</span>
-                  </div>
-                </button>
-                <button
-                  type="button"
-                  className="flex items-center gap-3 px-4 py-2.5 bg-black hover:bg-gray-900 border border-gray-800 rounded-xl transition-all cursor-pointer w-full sm:w-44 text-left"
+                  <span className="sr-only">Télécharger sur l'App Store</span>
+                  <img src="/apple-store.svg" alt="" loading="lazy" className="h-12 w-auto" />
+                </a>
+                <a
+                  href="#"
+                  className="rounded-md transition hover:opacity-85"
+                  title="Télécharger sur Google Play"
                 >
-                  <Smartphone size={18} className="text-yellow-500" />
-                  <div>
-                    <span className="block text-[8px] text-gray-400 uppercase leading-none font-bold">Disponible sur</span>
-                    <span className="block text-xs font-bold text-white leading-tight">Google Play</span>
-                  </div>
-                </button>
+                  <span className="sr-only">Télécharger sur Google Play</span>
+                  <img src="/play-store.svg" alt="" loading="lazy" className="h-12 w-auto" />
+                </a>
               </div>
-
             </div>
           </div>
 
-          {/* Right Smartphone Frame (Pure CSS Masterpiece) */}
-          <div className="flex-1 w-full flex justify-center items-center relative h-[380px] sm:h-[450px]">
-            {/* Phone 1: Background perspective phone */}
-            <div className="absolute transform rotate-[-6deg] translate-x-[-12%] translate-y-[5%] scale-90 sm:scale-95 w-48 h-80 sm:w-56 sm:h-96 bg-[#161a22] border-4 border-gray-700 rounded-[2.5rem] shadow-2xl overflow-hidden hidden sm:block border-opacity-70">
-              <div className="h-6 w-full bg-black flex justify-center items-center">
-                <div className="w-12 h-3.5 bg-gray-950 rounded-full"></div>
-              </div>
-              <div className="p-4 space-y-4 text-left">
-                <div className="flex items-center justify-between border-b border-gray-800 pb-2">
-                  <span className="text-[10px] text-gray-400 font-bold">Agadir Driver App</span>
-                  <div className="w-2 h-2 rounded-full bg-green-500"></div>
-                </div>
-                <div className="space-y-2">
-                  <div className="h-10 bg-gray-800/80 rounded-lg p-2 flex items-center justify-between text-[10px]">
-                    <span className="font-semibold">Aéroport Al Massira</span>
-                    <span className="text-yellow-500">→</span>
-                  </div>
-                  <div className="h-10 bg-gray-800/80 rounded-lg p-2 flex items-center justify-between text-[10px]">
-                    <span className="font-semibold">Taghazout Bay Resort</span>
-                    <span className="text-yellow-500">✔</span>
-                  </div>
-                </div>
-                <div className="pt-2">
-                  <span className="text-[10px] text-gray-500 block font-bold uppercase mb-1">Chauffeur assigné</span>
-                  <div className="flex items-center gap-2 bg-gray-800/50 p-2 rounded-lg">
-                    <div className="w-6 h-6 rounded-full bg-yellow-500"></div>
-                    <div>
-                      <span className="block text-[10px] font-bold">Karim A.</span>
-                      <span className="block text-[8px] text-gray-400">Mercedes Classe V</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
+          <div className="relative order-2 flex items-end justify-center md:justify-end">
+            <div className="relative w-[260px] pt-8 sm:w-[320px] md:w-[280px] md:pt-0 lg:w-[500px]">
+              <img
+                src={appMockup.url}
+                alt="Application Agadir Driver sur smartphone"
+                loading="lazy"
+                className="w-full object-contain"
+              />
             </div>
+          </div>
 
-            {/* Phone 2: Main foreground mockup */}
-            <div className="relative z-10 w-52 h-88 sm:w-60 sm:h-98 bg-[#0F1115] border-4 border-yellow-500 rounded-[2.5rem] shadow-2xl overflow-hidden border-opacity-80">
-              {/* Dynamic Island bar */}
-              <div className="h-6 w-full bg-black flex justify-center items-center">
-                <div className="w-14 h-3.5 bg-gray-950 rounded-full"></div>
-              </div>
-              
-              {/* Phone Content Screen */}
-              <div className="p-4 text-left h-full flex flex-col justify-between pb-8">
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <span className="text-[9px] text-gray-400 font-bold">Bienvenue</span>
-                      <span className="block text-xs font-black text-white">Yassine El Agadiri</span>
-                    </div>
-                    <div className="w-7 h-7 rounded-full bg-yellow-500 flex items-center justify-center font-bold text-xs text-black">
-                      Y
-                    </div>
-                  </div>
-
-                  {/* Active Ticket UI Card */}
-                  <div className="bg-gradient-to-br from-yellow-500 to-amber-600 rounded-2xl p-3.5 text-black space-y-3 shadow-md shadow-yellow-500/10">
-                    <div className="flex justify-between items-center text-[9px] font-bold uppercase tracking-wider">
-                      <span>Prochain Trajet</span>
-                      <span className="bg-black text-[#EAB308] px-1.5 py-0.5 rounded">Confirmé</span>
-                    </div>
-                    <div>
-                      <span className="text-[10px] font-bold opacity-70 uppercase">Lieu de prise en charge</span>
-                      <span className="block text-xs font-black truncate leading-tight">Aéroport Agadir (AGA)</span>
-                    </div>
-                    <div className="flex justify-between items-center text-[10px] font-bold pt-1.5 border-t border-black/10">
-                      <span>19 Juil, 13:45</span>
-                      <span className="bg-white/30 px-2 py-0.5 rounded text-[9px]">Class S</span>
-                    </div>
-                  </div>
-
-                  {/* Notification List Mock */}
-                  <div className="space-y-2">
-                    <span className="text-[9px] text-gray-500 font-bold uppercase tracking-wide block">Statut du Chauffeur</span>
-                    <div className="bg-gray-900 border border-gray-800 rounded-xl p-2.5 flex items-center gap-2">
-                      <Bell size={12} className="text-yellow-500 shrink-0" />
-                      <div>
-                        <span className="block text-[10px] font-bold">Chauffeur en route</span>
-                        <span className="block text-[8px] text-gray-400">Karim est parti vers l'aéroport.</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Simulated Bottom Navigation */}
-                <div className="border-t border-gray-900 pt-2 flex justify-between px-2 text-[9px] text-gray-500">
-                  <span className="text-yellow-500 font-bold">Accueil</span>
-                  <span>Trajets</span>
-                  <span>Messagerie</span>
-                  <span>Profil</span>
-                </div>
-              </div>
+          {/* Mobile: QR + store badges stacked, centered */}
+          <div className="order-3 flex flex-col items-center gap-3 pb-12 md:hidden">
+            <img
+              src="/app-qr.svg"
+              alt="QR code — télécharger l'application Agadir Driver"
+              loading="lazy"
+              className="h-44 w-44 rounded-lg bg-white object-contain p-2"
+            />
+            <p className="text-sm text-neutral-400">Télécharger l’application</p>
+            <div className="flex flex-col items-center gap-3">
+              <a href="#" className="block transition hover:opacity-85" title="App Store">
+                <span className="sr-only">Télécharger sur l'App Store</span>
+                <img
+                  src="/apple-store.svg"
+                  alt=""
+                  loading="lazy"
+                  className="block h-12 w-auto"
+                />
+              </a>
+              <a href="#" className="block transition hover:opacity-85" title="Google Play">
+                <span className="sr-only">Télécharger sur Google Play</span>
+                <img src="/play-store.svg" alt="" loading="lazy" className="block h-12 w-auto" />
+              </a>
             </div>
           </div>
 
         </div>
+
       </div>
     </section>
   );

@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import { MapPin, Calendar, Clock, Plus, Minus, Search, ArrowRight, CheckCircle2, User, Mail, Phone as PhoneIcon, Plane, CreditCard, Shield, RefreshCw, ChevronDown } from 'lucide-react';
+import { MapPin, Calendar, Clock, Plus, Minus, ArrowRight, CheckCircle2, User, Mail, Phone as PhoneIcon, Plane, CreditCard, Shield, RefreshCw, ChevronDown } from 'lucide-react';
 import { useNavigate } from '@tanstack/react-router';
 import { VEHICLES, MOROCCAN_AIRPORTS } from '../data';
 import { BookingDetails, VehicleClass } from '../types';
 import { motion, AnimatePresence } from 'motion/react';
 import LocationPicker from './LocationPicker';
 import { calculateRoutePrice } from '../lib/pricing';
+import { useI18n } from '../lib/i18n';
 
 
 interface BookingWidgetProps {
@@ -18,6 +19,7 @@ interface BookingWidgetProps {
 
 export default function BookingWidget({ onBookingComplete, onVehicleSelected, initialToLocation = '', initialVehicleId = '' }: BookingWidgetProps) {
   const navigate = useNavigate();
+  const { t } = useI18n();
   // Wizard Steps: 'search' | 'cars' | 'checkout' | 'success'
   const [step, setStep] = useState<'search' | 'cars' | 'checkout' | 'success'>(
     initialVehicleId ? 'checkout' : (initialToLocation ? 'cars' : 'search')
@@ -54,8 +56,8 @@ export default function BookingWidget({ onBookingComplete, onVehicleSelected, in
 
   const [searching, setSearching] = useState(false);
 
-  const calculatePrice = (vehicle: VehicleClass) => {
-    const pricing = calculateRoutePrice({
+  const calculatePrice = (vehicle: VehicleClass) =>
+    calculateRoutePrice({
       from: fromLocation,
       to: toLocation,
       vehicle,
@@ -63,8 +65,7 @@ export default function BookingWidget({ onBookingComplete, onVehicleSelected, in
       durationHours,
       hasReturn,
     });
-    return pricing.eur;
-  };
+
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -151,96 +152,114 @@ export default function BookingWidget({ onBookingComplete, onVehicleSelected, in
       }}
       title={pickerFor === 'from' ? 'Lieu de départ' : "Lieu d'arrivée"}
     />
-    <div id="booking-interface" className={`w-full rounded-2xl shadow-xl p-6 sm:p-8 max-w-xl mx-auto transition-all ${step === 'search' ? 'bg-[#0f1115] border border-white/5 shadow-[0_0_40px_-10px_rgba(245,166,35,0.35)]' : 'bg-white border border-gray-100'}`}>
+    {/* Booking type switch — detached pill above the card */}
+    {step === 'search' && (
+      <div className="mx-auto mb-3 flex w-full max-w-xl justify-start sm:mb-4">
+        <div className="inline-flex items-center gap-1 rounded-full border border-white/15 bg-ink/60 p-1 backdrop-blur-md">
+          <button
+            type="button"
+            onClick={() => setBookingType('transfer')}
+            className={`flex cursor-pointer items-center justify-center gap-2 rounded-full px-5 py-2.5 text-[14px] font-semibold transition-all ${
+              bookingType === 'transfer'
+                ? 'bg-white text-ink shadow-soft'
+                : 'text-white/70 hover:text-white'
+            }`}
+          >
+            <ArrowRight size={16} strokeWidth={1.75} />
+            <span>{t('booking.transfer')}</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setBookingType('hourly')}
+            className={`flex cursor-pointer items-center justify-center gap-2 rounded-full px-5 py-2.5 text-[14px] font-semibold transition-all ${
+              bookingType === 'hourly'
+                ? 'bg-white text-ink shadow-soft'
+                : 'text-white/70 hover:text-white'
+            }`}
+          >
+            <Clock size={16} strokeWidth={1.75} />
+            <span>{t('booking.hourly')}</span>
+          </button>
+        </div>
+      </div>
+    )}
+    <div
+      id="booking-interface"
+      className="mx-auto w-full max-w-xl rounded-3xl border border-line bg-surface p-4 shadow-float sm:rounded-2xl sm:p-7"
+    >
 
       {/* Search Step */}
       {step === 'search' && (
         <div>
-          {/* Tabs */}
-          <div className="flex gap-2 mb-6 bg-white/5 p-1.5 rounded-xl border border-white/10">
-            <button
-              type="button"
-              onClick={() => setBookingType('transfer')}
-              className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                bookingType === 'transfer'
-                  ? 'bg-[#F5A623] text-black shadow-sm'
-                  : 'text-gray-300 hover:text-white hover:bg-white/5'
-              }`}
-            >
-              <ArrowRight size={14} className={bookingType === 'transfer' ? 'text-black' : 'text-gray-400'} />
-              <span>Transfert</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => setBookingType('hourly')}
-              className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                bookingType === 'hourly'
-                  ? 'bg-[#F5A623] text-black shadow-sm'
-                  : 'text-gray-300 hover:text-white hover:bg-white/5'
-              }`}
-            >
-              <Clock size={14} className={bookingType === 'hourly' ? 'text-black' : 'text-gray-400'} />
-              <span>À l'heure</span>
-            </button>
+          <div className="mb-4 hidden sm:mb-5 sm:block">
+            <h2 className="text-xl font-bold tracking-[-0.02em] text-ink">{t('booking.title')}</h2>
+            <p className="mt-1 text-[13px] text-ink/55">{t('booking.subtitle')}</p>
           </div>
 
 
-          <form onSubmit={handleSearch} className="space-y-4">
+
+          <form onSubmit={handleSearch} className="space-y-2.5 sm:space-y-4">
             {/* From Location */}
             <div className="relative">
-              <label className="block text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-1">De</label>
               <button
                 type="button"
                 onClick={() => setPickerFor('from')}
-                className="w-full flex items-center bg-[#1a1d24] rounded-xl border border-white/10 hover:border-[#F5A623]/60 focus:border-[#F5A623] focus:ring-2 focus:ring-[#F5A623]/20 transition-all text-left cursor-pointer pl-11 pr-10 py-3.5 relative"
+                className="relative flex w-full cursor-pointer items-center rounded-2xl border border-line bg-surface py-3 pr-10 pl-12 text-left transition-all hover:border-ink/25 focus:border-ink focus:ring-2 focus:ring-accent/25 focus:outline-none sm:rounded-xl sm:bg-surface-alt"
               >
-                <MapPin size={18} className="absolute left-4 text-gray-300" />
-                <span className={`text-sm font-semibold truncate ${fromLocation ? 'text-white' : 'text-gray-500'}`}>
-                  {fromLocation || 'Aéroport, ville ou hôtel de départ...'}
+                <MapPin size={18} strokeWidth={1.75} className="absolute left-4 text-ink/35" />
+                <span className="block min-w-0 flex-1">
+                  <span className="block text-[12px] text-ink/45">{t('booking.from')}</span>
+                  <span className={`block truncate text-[15px] font-medium ${fromLocation ? 'text-ink' : 'text-ink/40'}`}>
+                    {fromLocation || t('booking.placeholder')}
+                  </span>
                 </span>
-                <ChevronDown size={16} className="absolute right-3 text-gray-400" />
+                <ChevronDown size={16} strokeWidth={1.75} className="absolute right-3.5 text-ink/40" />
               </button>
             </div>
 
             {/* To Location (Only if transfer type) */}
             {bookingType === 'transfer' ? (
               <div className="relative">
-                <label className="block text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-1">À</label>
                 <button
                   type="button"
                   onClick={() => setPickerFor('to')}
-                  className="w-full flex items-center bg-[#1a1d24] rounded-xl border border-white/10 hover:border-[#F5A623]/60 focus:border-[#F5A623] focus:ring-2 focus:ring-[#F5A623]/20 transition-all text-left cursor-pointer pl-11 pr-10 py-3.5 relative"
+                  className="relative flex w-full cursor-pointer items-center rounded-2xl border border-line bg-surface py-3 pr-10 pl-12 text-left transition-all hover:border-ink/25 focus:border-ink focus:ring-2 focus:ring-accent/25 focus:outline-none sm:rounded-xl sm:bg-surface-alt"
                 >
-                  <MapPin size={18} className="absolute left-4 text-gray-300" />
-                  <span className={`text-sm font-semibold truncate ${toLocation ? 'text-white' : 'text-gray-500'}`}>
-                    {toLocation || "Aéroport, ville ou hôtel d'arrivée..."}
+                  <MapPin size={18} strokeWidth={1.75} className="absolute left-4 text-ink/35" />
+                  <span className="block min-w-0 flex-1">
+                    <span className="block text-[12px] text-ink/45">{t('booking.to')}</span>
+                    <span className={`block truncate text-[15px] font-medium ${toLocation ? 'text-ink' : 'text-ink/40'}`}>
+                      {toLocation || t('booking.placeholder')}
+                    </span>
                   </span>
-                  <ChevronDown size={16} className="absolute right-3 text-gray-400" />
+                  <ChevronDown size={16} strokeWidth={1.75} className="absolute right-3.5 text-ink/40" />
                 </button>
               </div>
 
             ) : (
               /* Hourly duration */
               <div>
-                <label className="block text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-1">Durée de réservation</label>
-                <div className="relative flex items-center bg-[#1a1d24] rounded-xl border border-white/10 p-1">
-                  <div className="flex items-center justify-between w-full px-3 py-2">
-                    <span className="text-sm font-semibold text-gray-200">Heures demandées</span>
+                <label className="mb-1.5 block text-[12px] font-semibold text-ink/50">{t('booking.duration')}</label>
+                <div className="relative flex items-center rounded-xl border border-line bg-surface-alt p-1">
+                  <div className="flex w-full items-center justify-between px-3 py-2">
+                    <span className="text-[15px] font-medium text-ink">{t('booking.hoursRequested')}</span>
                     <div className="flex items-center gap-3">
                       <button
                         type="button"
                         onClick={() => setDurationHours(Math.max(2, durationHours - 1))}
-                        className="w-8 h-8 rounded-lg bg-white/10 border border-white/10 flex items-center justify-center text-gray-200 hover:bg-white/20 active:scale-95 transition-all cursor-pointer"
+                        className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-full border border-line bg-surface text-ink transition-all hover:border-ink/30 active:scale-95"
+                        aria-label="Réduire la durée"
                       >
-                        <Minus size={14} />
+                        <Minus size={15} strokeWidth={1.75} />
                       </button>
-                      <span className="font-mono font-bold text-sm text-white w-6 text-center">{durationHours} h</span>
+                      <span className="w-10 text-center text-[15px] font-semibold text-ink">{durationHours} h</span>
                       <button
                         type="button"
                         onClick={() => setDurationHours(Math.min(24, durationHours + 1))}
-                        className="w-8 h-8 rounded-lg bg-white/10 border border-white/10 flex items-center justify-center text-gray-200 hover:bg-white/20 active:scale-95 transition-all cursor-pointer"
+                        className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-full border border-line bg-surface text-ink transition-all hover:border-ink/30 active:scale-95"
+                        aria-label="Augmenter la durée"
                       >
-                        <Plus size={14} />
+                        <Plus size={15} strokeWidth={1.75} />
                       </button>
                     </div>
                   </div>
@@ -249,29 +268,29 @@ export default function BookingWidget({ onBookingComplete, onVehicleSelected, in
             )}
 
             {/* Date & Time Row */}
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-2.5 sm:gap-4">
               <div>
-                <label className="block text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-1">Date de départ</label>
-                <div className="relative flex items-center bg-[#1a1d24] rounded-xl border border-white/10 focus-within:border-[#F5A623] transition-all">
-                  <Calendar size={16} className="absolute left-3.5 text-gray-300" />
+                <div className="relative flex items-center rounded-2xl border border-line bg-surface transition-all focus-within:border-ink sm:rounded-xl sm:bg-surface-alt">
+                  <Calendar size={17} strokeWidth={1.75} className="absolute left-4 text-ink/35" />
+                  <span className="pointer-events-none absolute top-2 left-12 text-[12px] text-ink/45">{t('booking.date')}</span>
                   <input
                     type="date"
                     value={date}
                     onChange={(e) => setDate(e.target.value)}
-                    className="w-full pl-10 pr-3 py-3 bg-transparent rounded-xl text-xs font-semibold text-white focus:outline-none [color-scheme:dark]"
+                    className="w-full rounded-2xl bg-transparent pt-6 pr-2 pb-2 pl-12 text-[14px] font-medium text-ink focus:outline-none sm:rounded-xl"
                     required
                   />
                 </div>
               </div>
               <div>
-                <label className="block text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-1">Heure de départ</label>
-                <div className="relative flex items-center bg-[#1a1d24] rounded-xl border border-white/10 focus-within:border-[#F5A623] transition-all">
-                  <Clock size={16} className="absolute left-3.5 text-gray-300" />
+                <div className="relative flex items-center rounded-2xl border border-line bg-surface transition-all focus-within:border-ink sm:rounded-xl sm:bg-surface-alt">
+                  <Clock size={17} strokeWidth={1.75} className="absolute left-4 text-ink/35" />
+                  <span className="pointer-events-none absolute top-2 left-12 text-[12px] text-ink/45">{t('booking.time')}</span>
                   <input
                     type="time"
                     value={time}
                     onChange={(e) => setTime(e.target.value)}
-                    className="w-full pl-10 pr-3 py-3 bg-transparent rounded-xl text-xs font-semibold text-white focus:outline-none [color-scheme:dark]"
+                    className="w-full rounded-2xl bg-transparent pt-6 pr-2 pb-2 pl-12 text-[14px] font-medium text-ink focus:outline-none sm:rounded-xl"
                     required
                   />
                 </div>
@@ -286,40 +305,41 @@ export default function BookingWidget({ onBookingComplete, onVehicleSelected, in
                   <button
                     type="button"
                     onClick={() => setHasReturn(true)}
-                    className="w-full py-3 border-2 border-dashed border-white/15 hover:border-[#F5A623] hover:bg-[#F5A623]/5 text-xs font-bold text-gray-300 hover:text-[#F5A623] rounded-xl flex items-center justify-center gap-2 transition-all cursor-pointer"
+                    className="flex w-full cursor-pointer items-center justify-start gap-2 rounded-2xl border border-dashed border-line px-4 py-3.5 text-[14px] font-semibold text-ink/60 transition-all hover:border-accent hover:bg-accent-tint hover:text-ink sm:justify-center sm:rounded-xl sm:text-[13px]"
                   >
-                    <Plus size={14} />
-                    <span>AJOUTER RETOUR</span>
+                    <Plus size={16} strokeWidth={2} />
+                    <span>{t('booking.addReturn')}</span>
                   </button>
 
                 ) : (
-                  <div className="bg-amber-50/50 border border-amber-100 rounded-xl p-4 relative space-y-3">
+                  <div className="relative space-y-3 rounded-xl border border-line bg-surface-alt p-4">
                     <button
                       type="button"
                       onClick={() => setHasReturn(false)}
-                      className="absolute top-2 right-2 text-xs font-semibold text-red-500 hover:text-red-700 bg-white/80 rounded-full w-5 h-5 flex items-center justify-center border border-red-100"
+                      className="absolute top-2.5 right-2.5 flex h-6 w-6 cursor-pointer items-center justify-center rounded-full border border-line bg-surface text-ink/50 hover:text-ink"
+                      aria-label="Retirer le retour"
                     >
-                      <Minus size={10} />
+                      <Minus size={12} strokeWidth={2} />
                     </button>
-                    <span className="block text-[10px] font-bold text-amber-800 uppercase tracking-wide">Retour planifié (10% de réduction)</span>
+                    <span className="block text-[12px] font-semibold text-ink/60">Retour planifié (10% de réduction)</span>
                     <div className="grid grid-cols-2 gap-3">
                       <div>
-                        <label className="block text-[9px] font-bold text-gray-400 uppercase tracking-wider mb-1">Date de retour</label>
+                        <label className="mb-1.5 block text-[12px] font-semibold text-ink/50">Date de retour</label>
                         <input
                           type="date"
                           value={returnDate}
                           onChange={(e) => setReturnDate(e.target.value)}
-                          className="w-full px-3 py-2 bg-white rounded-lg border border-gray-200 text-xs font-semibold"
+                          className="w-full rounded-lg border border-line bg-surface px-3 py-2.5 text-[14px] font-medium text-ink focus:border-ink focus:outline-none"
                           required
                         />
                       </div>
                       <div>
-                        <label className="block text-[9px] font-bold text-gray-400 uppercase tracking-wider mb-1">Heure de retour</label>
+                        <label className="mb-1.5 block text-[12px] font-semibold text-ink/50">Heure de retour</label>
                         <input
                           type="time"
                           value={returnTime}
                           onChange={(e) => setReturnTime(e.target.value)}
-                          className="w-full px-3 py-2 bg-white rounded-lg border border-gray-200 text-xs font-semibold"
+                          className="w-full rounded-lg border border-line bg-surface px-3 py-2.5 text-[14px] font-medium text-ink focus:border-ink focus:outline-none"
                           required
                         />
                       </div>
@@ -330,26 +350,28 @@ export default function BookingWidget({ onBookingComplete, onVehicleSelected, in
             )}
 
             {/* Passenger Count Row */}
-            <div className="flex items-center justify-between border-t border-b border-white/10 py-4 my-2">
-              <div>
-                <span className="block text-xs font-bold text-white">Passagers</span>
-                <span className="block text-[10px] text-gray-400 font-medium">Bébés et enfants compris</span>
+            <div className="my-1 flex items-center justify-between gap-3 border-t border-b border-line py-3.5 sm:py-4">
+              <div className="min-w-0">
+                <span className="block text-[14px] font-semibold text-ink sm:text-[15px]">{t('booking.passengers')}</span>
+                <span className="block text-[12px] text-ink/50">{t('booking.infants')}</span>
               </div>
               <div className="flex items-center gap-3">
                 <button
                   type="button"
                   onClick={() => setPassengers(Math.max(1, passengers - 1))}
-                  className="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 active:scale-95 transition-all flex items-center justify-center text-gray-200 cursor-pointer"
+                  className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-full border border-line bg-surface text-ink transition-all hover:border-ink/30 active:scale-95"
+                  aria-label="Moins de passagers"
                 >
-                  <Minus size={14} />
+                  <Minus size={15} strokeWidth={1.75} />
                 </button>
-                <span className="font-mono font-bold text-base text-white w-6 text-center">{passengers}</span>
+                <span className="w-6 text-center text-[16px] font-semibold text-ink">{passengers}</span>
                 <button
                   type="button"
                   onClick={() => setPassengers(Math.min(16, passengers + 1))}
-                  className="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 active:scale-95 transition-all flex items-center justify-center text-gray-200 cursor-pointer"
+                  className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-full border border-line bg-surface text-ink transition-all hover:border-ink/30 active:scale-95"
+                  aria-label="Plus de passagers"
                 >
-                  <Plus size={14} />
+                  <Plus size={15} strokeWidth={1.75} />
                 </button>
               </div>
             </div>
@@ -358,32 +380,37 @@ export default function BookingWidget({ onBookingComplete, onVehicleSelected, in
             <button
               type="submit"
               disabled={searching}
-              className="w-full py-4 bg-[#F5A623] hover:bg-[#ffb733] text-black font-bold rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-[#F5A623]/30 hover:shadow-[#F5A623]/50 active:scale-[0.99] transition-all disabled:opacity-50 cursor-pointer text-sm tracking-wide"
+              className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-2xl bg-ink py-4 text-[15px] font-semibold text-white transition-all hover:bg-ink-soft active:scale-[0.99] disabled:opacity-50 sm:rounded-xl"
             >
               {searching ? (
                 <>
-                  <RefreshCw className="animate-spin text-black" size={18} />
+                  <RefreshCw className="animate-spin" size={18} strokeWidth={1.75} />
                   <span>Recherche de tarifs...</span>
                 </>
               ) : (
                 <>
-                  <Search size={18} />
-                  <span>Voir les prix</span>
+                  <span>{t('booking.seePrices')}</span>
+                  <ArrowRight size={18} strokeWidth={2} />
                 </>
               )}
             </button>
 
           </form>
 
-          {/* Trustpilot Excellent Seal matching design exactly */}
-          <div className="mt-6 flex items-center justify-center gap-2 bg-gray-50 py-3 px-4 rounded-xl border border-gray-100">
-            <span className="text-xs font-extrabold text-gray-900 tracking-wide font-display">EXCELLENT</span>
+          {/* Fixed-price trust line (mobile) */}
+          <p className="mt-3.5 text-center text-[12px] text-ink/45 sm:hidden">
+            {t('booking.footnote')}
+          </p>
+
+          {/* Trustpilot seal */}
+          <div className="mt-4 flex items-center justify-center gap-2 border-t border-line pt-4 sm:mt-5 sm:pt-5">
+            <span className="text-[13px] font-semibold text-ink">EXCELLENT</span>
             <div className="flex gap-0.5">
               {[1, 2, 3, 4, 5].map((s) => (
-                <div key={s} className="w-4 h-4 bg-[#00B67A] flex items-center justify-center text-white text-[10px] rounded-sm font-bold">★</div>
+                <span key={s} className="flex h-4 w-4 items-center justify-center rounded-sm bg-trust text-[10px] font-bold text-white">★</span>
               ))}
             </div>
-            <span className="text-xs font-bold text-gray-900">Trustpilot</span>
+            <span className="text-[13px] text-ink/55">Trustpilot</span>
           </div>
         </div>
       )}
@@ -423,7 +450,8 @@ export default function BookingWidget({ onBookingComplete, onVehicleSelected, in
           {/* List of Vehicles */}
           <div className="space-y-4 max-h-[450px] overflow-y-auto pr-1">
             {VEHICLES.map((vehicle) => {
-              const price = calculatePrice(vehicle);
+              const pricing = calculatePrice(vehicle);
+              const price = pricing.eur;
               // Hide cars that cannot fit the group size
               if (passengers > vehicle.passengers) return null;
 
@@ -446,8 +474,8 @@ export default function BookingWidget({ onBookingComplete, onVehicleSelected, in
                       <div className="flex justify-between items-start">
                         <h4 className="font-bold text-base text-gray-900 group-hover:text-[#EAB308] transition-colors">{vehicle.name}</h4>
                         <div className="text-right">
-                          <span className="text-[10px] text-gray-400 font-bold block uppercase leading-3">Tarif tout compris</span>
-                          <span className="text-xl font-extrabold text-gray-900 font-mono">{price} €</span>
+                          <span className="text-[10px] text-gray-400 font-bold block uppercase leading-3">{pricing.quoteRequired ? 'Sur devis' : 'Prix fixe par véhicule'}</span>
+                          <span className="text-xl font-extrabold text-gray-900 font-mono">{pricing.quoteRequired ? 'Devis' : `${price} €`}</span>
                         </div>
                       </div>
                       <p className="text-[11px] font-semibold text-gray-400 mt-0.5 font-mono">{vehicle.carModels}</p>
@@ -508,7 +536,7 @@ export default function BookingWidget({ onBookingComplete, onVehicleSelected, in
             </div>
             <div className="text-right">
               <span className="block text-[10px] text-gray-400 font-bold uppercase">Total</span>
-              <span className="text-lg font-extrabold text-[#EAB308] font-mono">{calculatePrice(selectedVehicle)} €</span>
+              <span className="text-lg font-extrabold text-[#EAB308] font-mono">{calculatePrice(selectedVehicle).eur} €</span>
             </div>
           </div>
 
@@ -640,7 +668,7 @@ export default function BookingWidget({ onBookingComplete, onVehicleSelected, in
             ) : (
               <>
                 <Shield size={16} className="text-[#0F1115]" />
-                <span>Confirmer la réservation et payer {calculatePrice(selectedVehicle)} €</span>
+                <span>Confirmer la réservation et payer {calculatePrice(selectedVehicle).eur} €</span>
               </>
             )}
           </button>
@@ -705,7 +733,7 @@ export default function BookingWidget({ onBookingComplete, onVehicleSelected, in
                 </div>
                 <div className="text-right">
                   <span className="text-[9px] text-gray-400 font-bold uppercase tracking-wider block">Montant Payé</span>
-                  <span className="font-extrabold text-[#EAB308] bg-[#0F1115] px-2.5 py-0.5 rounded font-mono text-sm">{calculatePrice(selectedVehicle)} €</span>
+                  <span className="font-extrabold text-[#EAB308] bg-[#0F1115] px-2.5 py-0.5 rounded font-mono text-sm">{calculatePrice(selectedVehicle).eur} €</span>
                 </div>
               </div>
             </div>

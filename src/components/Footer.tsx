@@ -1,178 +1,175 @@
-import { Facebook, Instagram, Twitter, MessageCircle, Phone, Mail } from "lucide-react";
-import Logo from "./Logo";
+import { Facebook, Instagram, Twitter, MessageCircle, Phone, Mail, Star } from 'lucide-react';
+import { AGADIR_DRIVER_LOGO_URL } from '../lib/brand-images';
 
-const WHATSAPP_NUMBER = "2120606419700";
-const WHATSAPP_LINK = `https://wa.me/${WHATSAPP_NUMBER}?text=Bonjour%20Agadir%20Driver%2C%20j%27ai%20besoin%20d%27aide%20pour%20mon%20transport.`;
-const SUPPORT_EMAIL = "support@agadirdriver.com";
+const AIRPORTS = [
+  'Aéroport Agadir Al Massira (AGA)',
+  'Aéroport Marrakech Ménara (RAK)',
+  'Aéroport Casablanca Mohammed V (CMN)',
+  'Aéroport Essaouira Mogador (ESU)',
+  'Aéroport Fès Saïss (FEZ)',
+  'Aéroport Tanger Ibn Battouta (TNG)',
+  'Aéroport Rabat-Salé (RBA)',
+];
 
-const COLUMNS: { title: string; links: string[] }[] = [
-  {
-    title: "Aéroports",
-    links: [
-      "Agadir Al Massira (AGA)",
-      "Marrakech Ménara (RAK)",
-      "Casablanca Mohammed V (CMN)",
-      "Essaouira Mogador (ESU)",
-      "Fès Saïss (FEZ)",
-      "Tanger Ibn Battouta (TNG)",
-      "Rabat-Salé (RBA)",
-    ],
-  },
-  {
-    title: "Services",
-    links: [
-      "Transferts aéroport",
-      "Transferts ville à ville",
-      "Chauffeur à l'heure",
-      "Agences de voyages",
-      "Entreprises & VIP",
-      "Espace chauffeur partenaire",
-      "Programme de fidélité",
-    ],
-  },
-  {
-    title: "Société",
-    links: [
-      "À propos",
-      "Recrutement",
-      "Centre d'aide & FAQ",
-      "Termes et conditions",
-      "Politique de confidentialité",
-      "Mentions légales",
-      "Blog voyage Maroc",
-    ],
-  },
+const SERVICES = [
+  'Transferts Aéroportuaires',
+  'Transferts Ville à Ville',
+  'Chauffeur à la demande (Horaire)',
+  'Solutions pour Agences de Voyages',
+  'Portail Entreprises & VIPs',
+  'Espace Chauffeur Partenaire',
+  'Devenir Chauffeur Agadir Driver',
+  'Programme de Fidélité Elite',
+];
+
+const COMPANY = [
+  'À propos de nous',
+  'Recrutement / Careers',
+  "Centre d'aide & FAQ",
+  'Termes et Conditions',
+  'Politique de Confidentialité',
+  'Mentions Légales',
+  'Blog Voyage Maroc',
 ];
 
 export default function Footer() {
-  return (
-    <footer className="bg-foreground text-white">
-      <div className="mx-auto max-w-7xl px-4 pt-16 pb-8 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 gap-10 border-b border-white/10 pb-12 md:grid-cols-2 lg:grid-cols-4">
-          {/* Brand + contact */}
-          <div className="flex flex-col gap-6">
-            <Logo tone="invert" className="text-[24px]" />
+  const whatsappNumber = '2120606419700';
+  const whatsappLink = `https://wa.me/${whatsappNumber}?text=Bonjour%20Agadir%20Driver%2C%20j%27ai%20besoin%20d%27aide%20pour%20mon%20transport.`;
+  const supportEmail = 'support@agadirdriver.com';
 
-            <p className="max-w-xs text-sm leading-relaxed text-white/60">
-              Chauffeur privé et transferts premium à Agadir, Taghazout, Marrakech, Essaouira et
-              partout au Maroc. Prix fixes, chauffeurs certifiés, disponibilité 24/7.
+  return (
+    <footer className="bg-ink text-white">
+      <div className="shell pt-16 pb-10 lg:pt-20">
+        <div className="grid grid-cols-1 gap-12 border-b border-white/10 pb-12 md:grid-cols-2 lg:grid-cols-4">
+          {/* Brand & assistance */}
+          <div>
+            <img src={AGADIR_DRIVER_LOGO_URL} alt="Agadir Driver" className="h-14 w-auto max-w-[240px] object-contain sm:h-16" />
+
+            <p className="mt-5 text-[14px] leading-relaxed text-white/55">
+              Votre partenaire d'élite pour vos déplacements d'affaires et touristiques à Agadir, Marrakech, Essaouira et dans tout le Maroc. Chauffeurs professionnels certifiés.
             </p>
 
-            <div className="flex flex-col gap-2.5 text-sm">
-              <a
-                href={`tel:+${WHATSAPP_NUMBER}`}
-                className="flex items-center gap-2.5 text-white/70 transition-colors hover:text-white"
-              >
-                <Phone size={15} aria-hidden="true" />
-                +212 606 419 700
-              </a>
-              <a
-                href={WHATSAPP_LINK}
-                target="_blank"
-                rel="noreferrer"
-                className="flex items-center gap-2.5 text-white/70 transition-colors hover:text-white"
-              >
-                <MessageCircle size={15} aria-hidden="true" />
-                WhatsApp 24/7
-              </a>
-              <a
-                href={`mailto:${SUPPORT_EMAIL}`}
-                className="flex items-center gap-2.5 text-white/70 transition-colors hover:text-white"
-              >
-                <Mail size={15} aria-hidden="true" />
-                {SUPPORT_EMAIL}
-              </a>
-            </div>
-
-            <div className="flex gap-2">
+            <div className="mt-6 flex gap-3">
               {[
-                { Icon: Facebook, label: "Facebook" },
-                { Icon: Instagram, label: "Instagram" },
-                { Icon: Twitter, label: "Twitter" },
+                { Icon: Facebook, label: 'Facebook' },
+                { Icon: Instagram, label: 'Instagram' },
+                { Icon: Twitter, label: 'Twitter' },
               ].map(({ Icon, label }) => (
                 <a
                   key={label}
                   href="#"
                   aria-label={label}
-                  className="flex h-10 w-10 items-center justify-center rounded-full border border-white/15 text-white/70 transition-colors hover:border-white hover:text-white"
+                  className="flex h-9 w-9 items-center justify-center rounded-full border border-white/12 text-white/60 transition-colors hover:border-accent hover:text-accent"
                 >
-                  <Icon size={16} aria-hidden="true" />
+                  <Icon size={16} strokeWidth={1.75} />
                 </a>
               ))}
             </div>
+
+            <div className="mt-7 space-y-2.5 text-[14px] text-white/60">
+              <span className="block text-[12px] font-semibold tracking-wide text-white/40 uppercase">Assistance 24/7</span>
+              <div className="flex items-center gap-2">
+                <Phone size={14} strokeWidth={1.75} className="text-accent" />
+                <span>+212 060 641 9700</span>
+              </div>
+              <a href={whatsappLink} target="_blank" rel="noreferrer" className="flex items-center gap-2 transition-colors hover:text-white">
+                <MessageCircle size={14} strokeWidth={1.75} className="text-accent" />
+                <span>WhatsApp : +212 060 641 9700</span>
+              </a>
+              <a href={`mailto:${supportEmail}`} className="flex items-center gap-2 transition-colors hover:text-white">
+                <Mail size={14} strokeWidth={1.75} className="text-accent" />
+                <span>{supportEmail}</span>
+              </a>
+            </div>
           </div>
 
-          {/* Link columns */}
-          {COLUMNS.map((col) => (
-            <nav key={col.title} aria-label={col.title} className="flex flex-col gap-4">
-              <h4 className="text-[15px] font-semibold text-white">{col.title}</h4>
-              <ul className="flex flex-col gap-2.5">
-                {col.links.map((link) => (
-                  <li key={link}>
-                    <a
-                      href="#booking"
-                      className="text-sm leading-relaxed text-white/60 transition-colors hover:text-white"
-                    >
-                      {link}
-                    </a>
-                  </li>
+          {/* Airports */}
+          <div>
+            <h4 className="text-[13px] font-semibold tracking-wide text-white/40 uppercase">Principaux Aéroports</h4>
+            <ul className="mt-5 space-y-3 text-[14px] text-white/60">
+              {AIRPORTS.map((item) => (
+                <li key={item}>
+                  <a href="#booking-interface" className="transition-colors hover:text-white">{item}</a>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Services */}
+          <div>
+            <h4 className="text-[13px] font-semibold tracking-wide text-white/40 uppercase">Nos Services</h4>
+            <ul className="mt-5 space-y-3 text-[14px] text-white/60">
+              {SERVICES.map((item) => (
+                <li key={item}>
+                  <a href="#" className="transition-colors hover:text-white">{item}</a>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Company + Trustpilot */}
+          <div>
+            <h4 className="text-[13px] font-semibold tracking-wide text-white/40 uppercase">Société</h4>
+            <ul className="mt-5 space-y-3 text-[14px] text-white/60">
+              {COMPANY.map((item) => (
+                <li key={item}>
+                  <a href="#" className="transition-colors hover:text-white">{item}</a>
+                </li>
+              ))}
+            </ul>
+
+            <div className="mt-7 rounded-xl border border-white/10 p-4">
+              <div className="flex items-center gap-1.5 text-[14px] font-semibold text-white">
+                <Star size={14} className="fill-trust text-trust" strokeWidth={0} />
+                Trustpilot Verified
+              </div>
+              <div className="mt-2 flex gap-0.5">
+                {[1, 2, 3, 4, 5].map((s) => (
+                  <Star key={s} size={14} className="fill-trust text-trust" strokeWidth={0} />
                 ))}
-              </ul>
-            </nav>
-          ))}
+              </div>
+              <span className="mt-2 block text-[13px] text-white/50">Note de 4.9/5 | 38 036 avis</span>
+            </div>
+          </div>
         </div>
 
-        {/* Rating strip */}
-        <div className="flex flex-col items-center gap-3 border-b border-white/10 py-6 sm:flex-row sm:justify-between">
-          <div className="flex items-center gap-2.5">
-            <div className="flex gap-0.5" aria-hidden="true">
-              {[1, 2, 3, 4, 5].map((s) => (
-                <span
-                  key={s}
-                  className="flex h-4 w-4 items-center justify-center rounded-sm bg-white text-[10px] font-bold text-foreground"
-                >
-                  ★
-                </span>
-              ))}
-            </div>
-            <span className="text-sm font-semibold">4,9 / 5</span>
-            <span className="text-sm text-white/50">38 036 avis vérifiés</span>
+        {/* Lower footer */}
+        <div className="flex flex-col items-center justify-between gap-6 pt-8 text-[13px] text-white/45 md:flex-row">
+          <div className="space-y-1.5 text-center md:text-left">
+            <span className="block">2026 © AGADIR DRIVER™ | All rights reserved.</span>
+            <span className="block text-[12px] text-white/35">
+              S.A.R.L. au Capital de 100 000 MAD | Patente N° 3451S7 | RC Agadir 530419 | I.F. 4581971
+            </span>
           </div>
 
+          <button type="button" className="cursor-pointer transition-colors hover:text-white">
+            Vos choix en matière de confidentialité
+          </button>
+
           <div className="flex flex-wrap justify-center gap-2">
-            {["Visa", "Mastercard", "Amex", "PayPal", "Apple Pay", "Google Pay"].map((brand) => (
-              <span
-                key={brand}
-                className="rounded border border-white/15 px-2.5 py-1 text-[11px] font-medium text-white/60"
-              >
+            {['Visa', 'Mastercard', 'Amex', 'PayPal', 'ApplePay', 'GooglePay'].map((brand) => (
+              <span key={brand} className="rounded-md border border-white/10 px-2.5 py-1 text-[11px] font-medium text-white/45">
                 {brand}
               </span>
             ))}
           </div>
         </div>
-
-        {/* Legal */}
-        <div className="flex flex-col gap-3 pt-6 text-center sm:flex-row sm:items-center sm:justify-between sm:text-left">
-          <p className="text-[13px] text-white/50">
-            © 2026 Agadir Driver. Tous droits réservés.
-          </p>
-          <p className="text-[11px] leading-relaxed text-white/35">
-            S.A.R.L. au capital de 100 000 MAD · Patente 3451S7 · RC Agadir 530419 · I.F. 4581971
-          </p>
-        </div>
       </div>
 
       {/* Floating support button */}
-      <a
-        href={WHATSAPP_LINK}
-        target="_blank"
-        rel="noreferrer"
-        aria-label="Contacter l'assistance sur WhatsApp"
-        className="fixed right-4 bottom-4 z-40 hidden items-center gap-2.5 rounded-full bg-background px-5 py-3.5 text-sm font-semibold text-foreground shadow-[0_8px_30px_rgba(0,0,0,0.25)] ring-1 ring-border transition-transform hover:scale-[1.03] lg:inline-flex"
-      >
-        <MessageCircle size={18} aria-hidden="true" />
-        Assistance 24/7
-      </a>
+      <div className="fixed right-5 bottom-5 z-40 sm:right-6 sm:bottom-6">
+        <a
+          href={whatsappLink}
+          target="_blank"
+          rel="noreferrer"
+          className="inline-flex items-center gap-2.5 rounded-full bg-accent px-4 py-3.5 text-[14px] font-semibold text-accent-foreground shadow-float transition-all hover:bg-accent-strong active:scale-[0.98]"
+          aria-label="Contacter le support WhatsApp"
+        >
+          <MessageCircle size={19} strokeWidth={1.75} />
+          <span className="hidden sm:inline">Support 24/7</span>
+          <span className="sm:hidden">Support</span>
+        </a>
+      </div>
     </footer>
   );
 }
