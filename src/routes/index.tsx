@@ -1,8 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { ShieldCheck, Star, Clock } from "lucide-react";
-import heroDesktop from "../assets/hero-desktop-v2.jpg.asset.json";
-import heroMobile from "../assets/hero-mobile-v2.jpg.asset.json";
+import { HOMEPAGE_HERO_IMAGE_URL, HOMEPAGE_HERO_MOBILE_IMAGE_URL } from "../lib/brand-images";
 import Header from "../components/Header";
 import BookingWidget from "../components/BookingWidget";
 import BookingBar from "../components/BookingBar";
@@ -85,7 +84,7 @@ function Index() {
           {/* Desktop: full-bleed background on the right */}
           <picture className="absolute inset-0 hidden lg:block">
             <img
-              src={heroDesktop.url}
+              src={HOMEPAGE_HERO_IMAGE_URL}
               alt="Passagère élégante à l'arrière d'une berline avec chauffeur privé"
               className="h-full w-full object-cover object-[70%_22%]"
             />
@@ -98,7 +97,7 @@ function Index() {
           {/* Mobile: smaller top banner so the model's face shows above the form */}
           <div className="relative h-[52vh] min-h-[360px] w-full lg:hidden">
             <img
-              src={heroMobile.url}
+              src={HOMEPAGE_HERO_MOBILE_IMAGE_URL}
               alt="Passagère élégante à l'arrière d'une berline avec chauffeur privé"
               className="h-full w-full object-cover object-[68%_12%]"
             />

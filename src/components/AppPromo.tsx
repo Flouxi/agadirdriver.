@@ -1,4 +1,4 @@
-import appMockup from '../assets/app-mockup-v2.png.asset.json';
+import { APP_MOCKUP_IMAGE_URL } from '../lib/brand-images';
 
 /* Procedural "city map" backdrop — grid streets + faint blocks + a route line */
 function MapBackdrop() {
@@ -150,7 +150,7 @@ export default function AppPromo() {
           <div className="relative order-2 flex items-end justify-center md:justify-end">
             <div className="relative w-[260px] pt-8 sm:w-[320px] md:w-[280px] md:pt-0 lg:w-[500px]">
               <img
-                src={appMockup.url}
+                src={APP_MOCKUP_IMAGE_URL}
                 alt="Application Agadir Driver sur smartphone"
                 loading="lazy"
                 className="w-full object-contain"
