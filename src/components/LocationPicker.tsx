@@ -1,178 +1,341 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Plane, Building2, Hotel, ArrowLeft, Search, X, MapPin, ChevronRight } from "lucide-react";
-import { AIRPORTS, CITIES, HOTELS, type LocationCategory, type LocationOption } from "../data/locations";
+import { Plane, Building2, Hotel, Search, X, Clock, ArrowLeft, MapPin } from "lucide-react";
+import type { LocationCategory, LocationOption } from "../data/locations";
+import {
+  normalize,
+  searchLocations,
+  readRecentLocations,
+  pushRecentLocation,
+} from "../lib/location-search";
 
 interface LocationPickerProps {
   open: boolean;
   onClose: () => void;
-  onSelect: (value: string) => void;
+  onSelect: (value: string, option: LocationOption) => void;
   title?: string;
-  anchorRef?: React.RefObject<HTMLElement | null>;
+  /** Current field value, used to prefill the query. */
+  value?: string;
 }
 
-const CATEGORIES: {
-  id: LocationCategory;
-  label: string;
-  desc: string;
-  icon: React.ReactNode;
-  list: LocationOption[];
-}[] = [
-  { id: "airport", label: "Aéroport", desc: "Transferts depuis/vers les aéroports", icon: <Plane size={18} />, list: AIRPORTS },
-  { id: "city", label: "Ville", desc: "Centres-villes & adresses principales", icon: <Building2 size={18} />, list: CITIES },
-  { id: "hotel", label: "Hôtel", desc: "Hôtels, resorts & surf camps", icon: <Hotel size={18} />, list: HOTELS },
+const FILTERS: { id: LocationCategory | "all"; label: string }[] = [
+  { id: "all", label: "Tout" },
+  { id: "airport", label: "Aéroports" },
+  { id: "city", label: "Villes" },
+  { id: "hotel", label: "Hôtels" },
 ];
 
-export default function LocationPicker({ open, onClose, onSelect, title = "Choisir un lieu" }: LocationPickerProps) {
-  const [cat, setCat] = useState<LocationCategory | null>(null);
-  const [query, setQuery] = useState("");
-  const panelRef = useRef<HTMLDivElement>(null);
+const CATEGORY_ICON: Record<LocationCategory, typeof Plane> = {
+  airport: Plane,
+  city: Building2,
+  hotel: Hotel,
+};
 
+/** Bold the matched slice of the label so scanning results is fast. */
+function Highlight({ text, query }: { text: string; query: string }) {
+  const q = normalize(query);
+  if (!q) return <>{text}</>;
+  const index = normalize(text).indexOf(q);
+  if (index < 0) return <>{text}</>;
+  return (
+    <>
+      {text.slice(0, index)}
+      <mark className="bg-transparent font-bold text-foreground">
+        {text.slice(index, index + q.length)}
+      </mark>
+      {text.slice(index + q.length)}
+    </>
+  );
+}
+
+export default function LocationPicker({
+  open,
+  onClose,
+  onSelect,
+  title = "Choisir un lieu",
+  value = "",
+}: LocationPickerProps) {
+  const [query, setQuery] = useState("");
+  const [filter, setFilter] = useState<LocationCategory | "all">("all");
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [recents, setRecents] = useState<LocationOption[]>([]);
+  const listRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  // Reset state each time the panel opens, and lock background scroll.
   useEffect(() => {
     if (!open) return;
-    setCat(null);
     setQuery("");
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-    };
-    document.addEventListener("keydown", onKey);
-    // Prevent background scroll on mobile
-    const prev = document.body.style.overflow;
+    setFilter("all");
+    setActiveIndex(0);
+    setRecents(readRecentLocations());
+
+    const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
+    const focusTimer = window.setTimeout(() => inputRef.current?.focus(), 60);
     return () => {
-      document.removeEventListener("keydown", onKey);
-      document.body.style.overflow = prev;
+      document.body.style.overflow = previousOverflow;
+      window.clearTimeout(focusTimer);
     };
-  }, [open, onClose]);
+  }, [open, value]);
 
-  const activeCat = useMemo(() => CATEGORIES.find((c) => c.id === cat) ?? null, [cat]);
+  const groups = useMemo(() => searchLocations(query, filter), [query, filter]);
+  const showRecents = !query && filter === "all" && recents.length > 0;
 
-  const filtered = useMemo(() => {
-    if (!activeCat) return [];
-    const q = query.trim().toLowerCase();
-    if (!q) return activeCat.list;
-    return activeCat.list.filter(
-      (l) => l.label.toLowerCase().includes(q) || (l.sublabel ?? "").toLowerCase().includes(q),
-    );
-  }, [activeCat, query]);
+  // Flat list drives keyboard navigation across all groups.
+  const flat = useMemo<LocationOption[]>(
+    () => [...(showRecents ? recents : []), ...groups.flatMap((g) => g.options)],
+    [groups, recents, showRecents],
+  );
 
-  if (!open) return null;
+  useEffect(() => setActiveIndex(0), [query, filter]);
 
-  const handlePick = (l: LocationOption) => {
-    onSelect(l.label);
+  const commit = (option: LocationOption) => {
+    pushRecentLocation(option);
+    onSelect(option.label, option);
     onClose();
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Escape") {
+      e.preventDefault();
+      onClose();
+      return;
+    }
+    if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+      e.preventDefault();
+      if (flat.length === 0) return;
+      setActiveIndex((i) => {
+        const next = e.key === "ArrowDown" ? i + 1 : i - 1;
+        return (next + flat.length) % flat.length;
+      });
+      return;
+    }
+    if (e.key === "Enter") {
+      e.preventDefault();
+      const option = flat[activeIndex];
+      if (option) commit(option);
+    }
+  };
+
+  // Keep the highlighted row visible.
+  useEffect(() => {
+    const el = listRef.current?.querySelector<HTMLElement>(`[data-index="${activeIndex}"]`);
+    el?.scrollIntoView({ block: "nearest" });
+  }, [activeIndex, flat.length]);
+
+  if (!open) return null;
+
+  let cursor = -1;
+
   return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
-      {/* Backdrop */}
-      <div
-        className="absolute inset-0 bg-black/40 backdrop-blur-[2px]"
+    <div className="fixed inset-0 z-[70] flex sm:items-center sm:justify-center sm:p-4">
+      <button
+        type="button"
+        aria-label="Fermer"
         onClick={onClose}
-        aria-hidden="true"
+        className="absolute inset-0 hidden cursor-default bg-foreground/40 sm:block"
       />
 
-      {/* Panel — bottom sheet on mobile, centered dialog on desktop */}
       <div
-        ref={panelRef}
         role="dialog"
         aria-modal="true"
         aria-label={title}
-        className="relative w-full sm:max-w-md bg-white rounded-t-2xl sm:rounded-2xl shadow-2xl border border-gray-100 overflow-hidden flex flex-col max-h-[85vh] sm:max-h-[80vh]"
+        onKeyDown={handleKeyDown}
+        className="relative flex w-full flex-col bg-background sm:max-h-[80vh] sm:max-w-xl sm:rounded-2xl sm:border sm:border-border sm:shadow-2xl"
       >
-        {/* Header */}
-        <div className="flex items-center gap-2 px-4 py-3 border-b border-gray-100">
-          {activeCat && (
+        {/* Search header */}
+        <div className="shrink-0 border-b border-border px-3 pt-3 pb-3 sm:px-4 sm:pt-4">
+          <div className="flex items-center gap-2">
             <button
               type="button"
-              onClick={() => { setCat(null); setQuery(""); }}
-              className="flex items-center gap-1 text-xs font-semibold text-gray-600 hover:text-gray-900 cursor-pointer -ml-1 px-1.5 py-1 rounded hover:bg-gray-50"
+              onClick={onClose}
+              aria-label="Fermer"
+              className="-ml-1 shrink-0 cursor-pointer rounded-lg p-2 text-foreground transition-colors hover:bg-muted sm:hidden"
             >
-              <ArrowLeft size={14} /> Retour
+              <ArrowLeft size={20} aria-hidden="true" />
             </button>
-          )}
-          <div className="flex-1 text-sm font-bold text-gray-900 truncate">
-            {activeCat ? activeCat.label : title}
+            <h2 className="flex-1 truncate text-[17px] font-semibold tracking-tight text-foreground">
+              {title}
+            </h2>
+            <button
+              type="button"
+              onClick={onClose}
+              aria-label="Fermer"
+              className="-mr-1 hidden shrink-0 cursor-pointer rounded-lg p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground sm:block"
+            >
+              <X size={18} aria-hidden="true" />
+            </button>
           </div>
-          <button
-            type="button"
-            onClick={onClose}
-            aria-label="Fermer"
-            className="w-8 h-8 rounded-full hover:bg-gray-100 flex items-center justify-center text-gray-500 cursor-pointer"
-          >
-            <X size={16} />
-          </button>
-        </div>
 
-        {/* Body */}
-        {!activeCat ? (
-          <div className="p-3 space-y-2 overflow-y-auto">
-            {CATEGORIES.map((c) => (
+          <div className="mt-3 flex items-center rounded-lg bg-muted focus-within:ring-2 focus-within:ring-ring">
+            <Search size={18} className="ml-3.5 shrink-0 text-muted-foreground" aria-hidden="true" />
+            <input
+              ref={inputRef}
+              type="text"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Aéroport, ville, hôtel ou adresse"
+              aria-label="Rechercher un lieu"
+              autoComplete="off"
+              className="w-full bg-transparent px-3 py-3.5 text-[15px] font-medium text-foreground placeholder-muted-foreground focus:outline-none"
+            />
+            {query && (
               <button
-                key={c.id}
                 type="button"
-                onClick={() => setCat(c.id)}
-                className="w-full flex items-center gap-3 p-3 rounded-xl border border-gray-100 hover:border-gray-900 hover:bg-gray-50 text-left transition-all cursor-pointer"
+                onClick={() => {
+                  setQuery("");
+                  inputRef.current?.focus();
+                }}
+                aria-label="Effacer la recherche"
+                className="mr-2 shrink-0 cursor-pointer rounded-full p-1.5 text-muted-foreground transition-colors hover:bg-border hover:text-foreground"
               >
-                <div className="w-10 h-10 rounded-lg bg-[#0F1115] text-[#EAB308] flex items-center justify-center shrink-0">
-                  {c.icon}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="text-sm font-bold text-gray-900">{c.label}</div>
-                  <div className="text-[12px] text-gray-500">{c.desc}</div>
-                </div>
-                <ChevronRight size={16} className="text-gray-400 shrink-0" />
+                <X size={14} aria-hidden="true" />
+              </button>
+            )}
+          </div>
+
+          <div className="no-scrollbar -mx-1 mt-3 flex gap-2 overflow-x-auto px-1 pb-0.5">
+            {FILTERS.map((f) => (
+              <button
+                key={f.id}
+                type="button"
+                onClick={() => setFilter(f.id)}
+                aria-pressed={filter === f.id}
+                className={`shrink-0 cursor-pointer rounded-full px-3.5 py-1.5 text-[13px] font-semibold transition-colors ${
+                  filter === f.id
+                    ? "bg-primary text-primary-foreground"
+                    : "bg-muted text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                {f.label}
               </button>
             ))}
           </div>
-        ) : (
-          <>
-            <div className="p-3 border-b border-gray-100">
-              <div className="relative flex items-center bg-gray-50 rounded-xl border border-gray-200/80 focus-within:border-gray-900">
-                <Search size={16} className="absolute left-3 text-gray-400" />
-                <input
-                  autoFocus
-                  type="text"
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                  placeholder={`Rechercher un ${activeCat.label.toLowerCase()}...`}
-                  className="w-full pl-9 pr-3 py-2.5 bg-transparent rounded-xl text-sm font-medium text-gray-900 focus:outline-none placeholder-gray-400"
-                />
-              </div>
+        </div>
+
+        {/* Results */}
+        <div ref={listRef} className="flex-1 overflow-y-auto overscroll-contain pb-4">
+          {flat.length === 0 && (
+            <div className="px-6 py-14 text-center">
+              <MapPin size={22} className="mx-auto text-muted-foreground" aria-hidden="true" />
+              <p className="mt-3 text-[15px] font-semibold text-foreground">Aucun lieu trouvé</p>
+              <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
+                Essayez un autre nom, ou choisissez « Mon hôtel n&apos;est pas dans la liste ».
+              </p>
             </div>
-            <div className="flex-1 overflow-y-auto py-1">
-              {filtered.length === 0 ? (
-                <div className="text-center text-xs text-gray-400 py-8">Aucun résultat.</div>
-              ) : (
-                filtered.map((l) => (
-                  <button
-                    key={l.id}
-                    type="button"
-                    onClick={() => handlePick(l)}
-                    className={`w-full text-left flex items-center gap-3 px-4 py-3 hover:bg-gray-50 border-b border-gray-50 last:border-0 cursor-pointer ${
-                      l.vip ? "bg-gradient-to-r from-amber-50 to-transparent" : ""
-                    }`}
-                  >
-                    <MapPin size={14} className={l.vip ? "text-amber-500 shrink-0" : "text-[#EAB308] shrink-0"} />
-                    <div className="min-w-0 flex-1">
-                      <div className="text-sm font-semibold text-gray-900 truncate flex items-center gap-1.5">
-                        <span className="truncate">{l.label}</span>
-                        {l.vip && (
-                          <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold bg-amber-500 text-white tracking-wider shrink-0">
-                            VIP
-                          </span>
-                        )}
-                      </div>
-                      {l.sublabel && (
-                        <div className="text-[11px] text-gray-500 truncate">{l.sublabel}</div>
-                      )}
-                    </div>
-                  </button>
-                ))
-              )}
-            </div>
-          </>
-        )}
+          )}
+
+          {showRecents && (
+            <section aria-label="Recherches récentes">
+              <h3 className="px-4 pt-4 pb-1.5 text-[11px] font-bold tracking-widest text-muted-foreground uppercase">
+                Récent
+              </h3>
+              {recents.map((option) => {
+                cursor += 1;
+                return (
+                  <Row
+                    key={`recent-${option.id}`}
+                    index={cursor}
+                    active={cursor === activeIndex}
+                    option={option}
+                    query={query}
+                    icon={Clock}
+                    onHover={setActiveIndex}
+                    onSelect={commit}
+                  />
+                );
+              })}
+            </section>
+          )}
+
+          {groups.map((group) => (
+            <section key={group.category} aria-label={group.label}>
+              <h3 className="px-4 pt-4 pb-1.5 text-[11px] font-bold tracking-widest text-muted-foreground uppercase">
+                {group.label}
+              </h3>
+              {group.options.map((option) => {
+                cursor += 1;
+                return (
+                  <Row
+                    key={option.id}
+                    index={cursor}
+                    active={cursor === activeIndex}
+                    option={option}
+                    query={query}
+                    icon={CATEGORY_ICON[option.category]}
+                    onHover={setActiveIndex}
+                    onSelect={commit}
+                  />
+                );
+              })}
+            </section>
+          ))}
+        </div>
+
+        <p className="hidden shrink-0 items-center justify-center gap-3 border-t border-border px-4 py-2.5 text-[11px] text-muted-foreground sm:flex">
+          <span>
+            <kbd className="font-mono font-semibold">↑</kbd>{" "}
+            <kbd className="font-mono font-semibold">↓</kbd> naviguer
+          </span>
+          <span>
+            <kbd className="font-mono font-semibold">Entrée</kbd> sélectionner
+          </span>
+          <span>
+            <kbd className="font-mono font-semibold">Échap</kbd> fermer
+          </span>
+        </p>
       </div>
     </div>
+  );
+}
+
+function Row({
+  option,
+  index,
+  active,
+  query,
+  icon: Icon,
+  onHover,
+  onSelect,
+}: {
+  option: LocationOption;
+  index: number;
+  active: boolean;
+  query: string;
+  icon: typeof Plane;
+  onHover: (index: number) => void;
+  onSelect: (option: LocationOption) => void;
+}) {
+  return (
+    <button
+      type="button"
+      data-index={index}
+      onMouseMove={() => onHover(index)}
+      onClick={() => onSelect(option)}
+      className={`flex w-full cursor-pointer items-center gap-3 px-4 py-3 text-left transition-colors ${
+        active ? "bg-muted" : "bg-transparent"
+      }`}
+    >
+      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-secondary text-foreground">
+        <Icon size={16} aria-hidden="true" />
+      </span>
+      <span className="min-w-0 flex-1">
+        <span className="flex items-center gap-1.5">
+          <span className="truncate text-[15px] font-medium text-foreground">
+            <Highlight text={option.label} query={query} />
+          </span>
+          {option.vip && (
+            <span className="shrink-0 rounded border border-border px-1.5 py-px text-[9px] font-bold tracking-wider text-muted-foreground uppercase">
+              VIP
+            </span>
+          )}
+        </span>
+        {option.sublabel && (
+          <span className="mt-0.5 block truncate text-[13px] text-muted-foreground">
+            {option.sublabel}
+          </span>
+        )}
+      </span>
+    </button>
   );
 }
